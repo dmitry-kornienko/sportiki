@@ -1,0 +1,15 @@
+{
+  "name": "sportiki",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "bot:deploy:dev":  "npm run deploy:dev  --prefix gas/bot",
+    "bot:deploy:prod": "npm run deploy:prod --prefix gas/bot",
+    "api:deploy:dev":  "npm run deploy:dev  --prefix gas/api",
+    "api:deploy:prod": "npm run deploy:prod --prefix gas/api",
+    "miniapp:dev":     "npm run dev   --prefix miniapp",
+    "miniapp:build":   "npm run build --prefix miniapp",
+    "miniapp:deploy":  "npm run miniapp:build && node scripts/deploy-gh-pages.js",
+    "dev:deploy":      "npm run bot:deploy:dev && npm run api:deploy:dev && npm run miniapp:deploy"
+  }
+}
