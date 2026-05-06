@@ -27,6 +27,32 @@ function ping() {
 	console.log('✅ Deployed at: ' + new Date().toISOString())
 }
 
+/**
+ * Устанавливает кнопку Menu Button бота (нижний левый угол чата).
+ * Запускать вручную из редактора GAS после смены URL Mini App.
+ * URL берётся из Script Properties → MINI_APP_URL.
+ */
+function setMenuButton() {
+	const token = getBotToken()
+	const url = MINI_APP_URL
+	const response = UrlFetchApp.fetch(
+		`https://api.telegram.org/bot${token}/setChatMenuButton`,
+		{
+			method: 'post',
+			contentType: 'application/json',
+			payload: JSON.stringify({
+				menu_button: {
+					type: 'web_app',
+					text: 'Открыть Sportiki',
+					web_app: { url },
+				},
+			}),
+		},
+	)
+	console.log('Menu button set to: ' + url)
+	console.log('Ответ Telegram: ' + response.getContentText())
+}
+
 function clearWebhookQueue() {
 	const token = getBotToken()
 	// Удаляем webhook

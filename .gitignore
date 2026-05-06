@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+miniapp/node_modules/
+
+# Build output
+miniapp/dist/
+
+# Environment variables
+.env
+miniapp/.env
+
+# Clasp active config (generated from .clasp.dev.json / .clasp.prod.json)
+gas/api/.clasp.json
+gas/bot/.clasp.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Old vanilla prototype
+/index.html

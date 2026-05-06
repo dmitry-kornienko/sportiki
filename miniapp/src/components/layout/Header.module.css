@@ -1,0 +1,28 @@
+.header {
+	flex-shrink: 0;
+	background: var(--white);
+	border-bottom: 1.5px solid var(--border);
+	padding: 12px 20px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.logo {
+	font-family: 'Barlow Condensed', sans-serif;
+	font-weight: 900;
+	font-size: 22px;
+	letter-spacing: 0.04em;
+	color: var(--accent);
+	text-transform: uppercase;
+	line-height: 1;
+}
+
+.logo span {
+	display: block;
+	font-weight: 400;
+	font-size: 10px;
+	letter-spacing: 0.2em;
+	color: var(--gray);
+	margin-bottom: 1px;
+}

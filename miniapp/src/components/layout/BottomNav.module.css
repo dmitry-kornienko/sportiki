@@ -1,0 +1,56 @@
+.nav {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: var(--nav-h);
+	background: var(--white);
+	border-top: 1.5px solid var(--border);
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	padding-bottom: env(safe-area-inset-bottom);
+	z-index: 100;
+}
+
+.btn {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 3px;
+	padding: 8px 4px;
+	cursor: pointer;
+	border: none;
+	background: none;
+	border-radius: 12px;
+	transition: transform 0.15s;
+}
+
+.btn:active {
+	transform: scale(0.92);
+}
+
+.icon {
+	font-size: 22px;
+	line-height: 1;
+	transition: transform 0.2s;
+}
+
+.label {
+	font-family: 'Barlow Condensed', sans-serif;
+	font-weight: 700;
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--gray);
+	transition: color 0.2s;
+}
+
+.btn.active .label {
+	color: var(--accent);
+}
+
+.btn.active .icon {
+	transform: scale(1.15);
+}

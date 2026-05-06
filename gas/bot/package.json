@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "push:dev":   "cp .clasp.dev.json .clasp.json && clasp push",
-    "push:prod":  "cp .clasp.prod.json .clasp.json && clasp push",
-    "deploy":     "cp .clasp.prod.json .clasp.json && clasp push && clasp deploy",
-    "open:dev":   "cp .clasp.dev.json .clasp.json && clasp open",
-    "open:prod":  "cp .clasp.prod.json .clasp.json && clasp open",
-    "logs":       "cp .clasp.prod.json .clasp.json && clasp logs"
+    "push:dev":   "node -e \"require('fs').copyFileSync('.clasp.dev.json','.clasp.json')\" && npx clasp push",
+    "push:prod":  "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && npx clasp push",
+    "deploy":     "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && npx clasp push && npx clasp deploy",
+    "open:dev":   "node -e \"require('fs').copyFileSync('.clasp.dev.json','.clasp.json')\" && npx clasp open",
+    "open:prod":  "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && npx clasp open",
+    "logs":       "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && npx clasp logs"
   },
   "devDependencies": {
     "@google/clasp": "^2.4.2"

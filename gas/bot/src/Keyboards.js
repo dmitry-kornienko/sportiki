@@ -16,7 +16,7 @@ const Keyboards = {
 		})
 
 		buttons.push([{ text: Texts.buttons.myRegs, callback_data: 'my_regs' }])
-		buttons.push([{ text: '👕 Мерч', web_app: { url: MERCH_APP_URL } }])
+		buttons.push([{ text: '🏃 Открыть Sportiki', web_app: { url: MINI_APP_URL } }])
 
 		if (isAdmin(chatId)) {
 			buttons.push([

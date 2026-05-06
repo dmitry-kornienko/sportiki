@@ -43,7 +43,11 @@ function getMerchManagerId() {
 // --- КОНФИГУРАЦИЯ ---
 
 const CHANNEL_URL = 'https://t.me/INaumkin_coach'
-const MERCH_APP_URL = 'https://dmitry-kornienko.github.io/sportiki-merch'
+
+// URL Mini App — задаётся через Script Properties (ключ MINI_APP_URL).
+// Dev: ngrok-ссылка или localhost. Prod: GitHub Pages URL.
+const MINI_APP_URL =
+	_PROPS['MINI_APP_URL'] || 'https://dmitry-kornienko.github.io/sportiki'
 
 /** Максимальное количество мест в резерве */
 const RESERVE_LIMIT = 20
