@@ -26,16 +26,19 @@ export function EventsScreen({ onToast }: Props) {
 			isGuest: false,
 		}
 		addRegistration(reg)
-		if (selectedEvent?.id === eventId) {
-			setSelectedEvent(prev => prev ? { ...prev, mainCount: prev.mainCount + 1, isFull: status === 'MAIN' ? prev.mainCount + 1 >= prev.maxPeople : prev.isFull } : prev)
-		}
 	}
 
-	function handleUnregister(eventId: string) {
-		removeRegistration(eventId)
-		if (selectedEvent?.id === eventId) {
-			setSelectedEvent(prev => prev ? { ...prev, mainCount: Math.max(0, prev.mainCount - 1), isFull: false } : prev)
-		}
+	if (selectedEvent) {
+		return (
+			<EventDetail
+				event={selectedEvent}
+				regStatus={isRegistered(selectedEvent.id) ? getRegStatus(selectedEvent.id) : null}
+				onRegister={handleRegister}
+				onUnregister={removeRegistration}
+				onToast={onToast}
+				onBack={() => setSelectedEvent(null)}
+			/>
+		)
 	}
 
 	return (
@@ -50,17 +53,6 @@ export function EventsScreen({ onToast }: Props) {
 					onClick={() => setSelectedEvent(event)}
 				/>
 			))}
-
-			{selectedEvent && (
-				<EventDetail
-					event={selectedEvent}
-					regStatus={isRegistered(selectedEvent.id) ? getRegStatus(selectedEvent.id) : null}
-					onRegister={handleRegister}
-					onUnregister={handleUnregister}
-					onToast={onToast}
-					onBack={() => setSelectedEvent(null)}
-				/>
-			)}
 		</div>
 	)
 }

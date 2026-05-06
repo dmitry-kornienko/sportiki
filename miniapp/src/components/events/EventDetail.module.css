@@ -1,17 +1,7 @@
-.overlay {
-	position: fixed;
-	inset: 0;
-	background: var(--bg);
-	z-index: 100;
+.page {
 	display: flex;
 	flex-direction: column;
-	animation: slideUp 0.22s ease;
-	overflow-y: auto;
-}
-
-@keyframes slideUp {
-	from { transform: translateY(40px); opacity: 0; }
-	to   { transform: translateY(0);    opacity: 1; }
+	min-height: 100%;
 }
 
 .header {
@@ -20,10 +10,6 @@
 	gap: 10px;
 	padding: 14px 16px;
 	border-bottom: 1.5px solid var(--border);
-	position: sticky;
-	top: 0;
-	background: var(--bg);
-	z-index: 1;
 }
 
 .backBtn {
@@ -83,9 +69,6 @@
 .metaItem {
 	font-size: 14px;
 	color: var(--text);
-	display: flex;
-	align-items: center;
-	gap: 6px;
 }
 
 .desc {

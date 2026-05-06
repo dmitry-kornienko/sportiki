@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { createPortal } from 'react-dom'
 import type { Event } from '../../types'
 import { register, unregister } from '../../api/registrations'
 import s from './EventDetail.module.css'
@@ -80,8 +79,8 @@ export function EventDetail({ event, regStatus, onRegister, onUnregister, onToas
 			? s.countReserve
 			: s.count
 
-	return createPortal(
-		<div className={s.overlay}>
+	return (
+		<div className={s.page}>
 			<div className={s.header}>
 				<button className={s.backBtn} onClick={onBack}>←</button>
 				<div className={s.headerTitle}>{event.title}</div>
@@ -111,7 +110,6 @@ export function EventDetail({ event, regStatus, onRegister, onUnregister, onToas
 
 				{renderButton()}
 			</div>
-		</div>,
-		document.body
+		</div>
 	)
 }
