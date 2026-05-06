@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Event } from '../../types'
 import { register, unregister } from '../../api/registrations'
+import { Loader } from '../ui/Loader'
 import s from './EventDetail.module.css'
 
 interface Props {
@@ -42,16 +43,19 @@ export function EventDetail({ event, regStatus, onRegister, onUnregister, onToas
 	}
 
 	function renderButton() {
+		if (loading) {
+			return <button className={`${s.btn} ${s.btnLoading}`} disabled><Loader /></button>
+		}
 		if (regStatus === 'MAIN') {
 			return (
-				<button className={`${s.btn} ${s.btnRegistered}`} onClick={handleUnregister} disabled={loading}>
+				<button className={`${s.btn} ${s.btnRegistered}`} onClick={handleUnregister}>
 					✓ Записан — отменить запись
 				</button>
 			)
 		}
 		if (regStatus === 'RESERVE') {
 			return (
-				<button className={`${s.btn} ${s.btnReserved}`} onClick={handleUnregister} disabled={loading}>
+				<button className={`${s.btn} ${s.btnReserved}`} onClick={handleUnregister}>
 					⏳ В резерве — отменить
 				</button>
 			)
@@ -61,13 +65,13 @@ export function EventDetail({ event, regStatus, onRegister, onUnregister, onToas
 		}
 		if (event.isFull && event.hasReserve) {
 			return (
-				<button className={`${s.btn} ${s.btnReserve}`} onClick={handleRegister} disabled={loading}>
+				<button className={`${s.btn} ${s.btnReserve}`} onClick={handleRegister}>
 					Записаться в резерв
 				</button>
 			)
 		}
 		return (
-			<button className={`${s.btn} ${s.btnRegister}`} onClick={handleRegister} disabled={loading}>
+			<button className={`${s.btn} ${s.btnRegister}`} onClick={handleRegister}>
 				Записаться
 			</button>
 		)

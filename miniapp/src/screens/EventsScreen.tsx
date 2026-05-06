@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useEvents } from '../hooks/useEvents'
 import { EventCard } from '../components/events/EventCard'
 import { EventDetail } from '../components/events/EventDetail'
+import { Loader } from '../components/ui/Loader'
 import type { Event, Registration } from '../types'
 import { getTelegramUserId } from '../utils/telegram'
 import s from './EventsScreen.module.css'
@@ -14,7 +15,7 @@ export function EventsScreen({ onToast }: Props) {
 	const { events, loading, error, isRegistered, getRegStatus, addRegistration, removeRegistration } = useEvents()
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
 
-	if (loading) return <div className={s.loading}>Загружаем события...</div>
+	if (loading) return <Loader fullscreen />
 	if (error) return <div className={s.error}>Ошибка: {error}</div>
 
 	function handleRegister(eventId: string, status: 'MAIN' | 'RESERVE') {

@@ -154,3 +154,8 @@
 	color: var(--gray);
 	cursor: default;
 }
+
+.btnLoading {
+	background: var(--border);
+	cursor: default;
+}
