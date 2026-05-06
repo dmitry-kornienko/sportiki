@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sportiki Merch</title>
+<title>Sportiki</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
@@ -11,15 +11,15 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --black: #0d0d0d;
-    --white: #f5f3ef;
-    --accent: #1a2744;
-    --pink: #e8a0b0;
-    --slate: #3d4f6b;
-    --gray: #8a8a8a;
-    --light: #ebebeb;
+    --black:   #0d0d0d;
+    --white:   #f5f3ef;
+    --accent:  #1a2744;
+    --pink:    #e8a0b0;
+    --gray:    #8a8a8a;
+    --light:   #ebebeb;
     --card-bg: #ffffff;
-    --border: #e0ddd8;
+    --border:  #e0ddd8;
+    --nav-h:   64px;
   }
 
   html, body {
@@ -27,18 +27,23 @@
     background: var(--white);
     color: var(--black);
     font-family: 'Barlow', sans-serif;
-    overflow-x: hidden;
+    overflow: hidden;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
   }
 
   /* ── HEADER ── */
   .header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    flex-shrink: 0;
     background: var(--white);
     border-bottom: 1.5px solid var(--border);
-    padding: 14px 20px 12px;
+    padding: 12px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -51,83 +56,51 @@
     letter-spacing: 0.04em;
     color: var(--accent);
     text-transform: uppercase;
+    line-height: 1;
   }
 
   .logo span {
+    display: block;
     font-weight: 400;
     font-size: 10px;
-    display: block;
     letter-spacing: 0.2em;
     color: var(--gray);
-    margin-bottom: -2px;
+    margin-bottom: 1px;
   }
 
-  .cart-btn {
-    position: relative;
-    background: var(--accent);
-    color: var(--white);
-    border: none;
-    border-radius: 50px;
-    padding: 8px 16px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: transform 0.15s, background 0.15s;
-  }
-
-  .cart-btn:active { transform: scale(0.95); }
-  .cart-btn.has-items { background: var(--black); }
-
-  .cart-count {
-    background: var(--pink);
-    color: var(--black);
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 11px;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  /* ── MERCH SUB-TABS ── */
+  .merch-tabs {
     display: none;
-  }
-
-  .cart-btn.has-items .cart-count { display: flex; }
-
-  /* ── TABS ── */
-  .tabs {
-    display: flex;
-    padding: 16px 20px 0;
-    gap: 8px;
-    border-bottom: 1.5px solid var(--border);
+    flex-shrink: 0;
     background: var(--white);
+    border-bottom: 1.5px solid var(--border);
+    padding: 0 16px;
+    gap: 4px;
   }
 
-  .tab {
+  .merch-tabs.visible { display: flex; }
+
+  .merch-tab {
+    position: relative;
+    padding: 10px 14px;
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
     font-size: 13px;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--gray);
     background: none;
     border: none;
-    padding: 6px 14px 10px;
     cursor: pointer;
-    position: relative;
     transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
-  .tab.active {
-    color: var(--accent);
-  }
+  .merch-tab.active { color: var(--accent); }
 
-  .tab.active::after {
+  .merch-tab.active::after {
     content: '';
     position: absolute;
     bottom: -1.5px;
@@ -137,14 +110,138 @@
     border-radius: 2px 2px 0 0;
   }
 
-  /* ── PRODUCT GRID ── */
-  .screen { display: none; padding: 20px; }
+  .tab-badge {
+    background: var(--accent);
+    color: var(--white);
+    border-radius: 50px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    font-size: 11px;
+    font-weight: 800;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tab-badge.visible { display: flex; }
+
+  /* ── CONTENT ── */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── SCREENS ── */
+  .screen {
+    display: none;
+    padding: 16px 16px calc(var(--nav-h) + 20px);
+    min-height: 100%;
+  }
+
   .screen.active { display: block; }
 
+  /* Подэкраны мерча */
+  .merch-sub {
+    display: none;
+    padding: 16px 16px calc(var(--nav-h) + 20px);
+    min-height: 100%;
+  }
+
+  .merch-sub.active { display: block; }
+
+  .screen-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 26px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--accent);
+    margin-bottom: 2px;
+  }
+
+  .screen-sub {
+    font-size: 12px;
+    color: var(--gray);
+    margin-bottom: 16px;
+  }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    background: var(--white);
+    border-top: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 100;
+  }
+
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 8px 4px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-radius: 12px;
+    transition: transform 0.15s;
+  }
+
+  .nav-btn:active { transform: scale(0.92); }
+
+  .nav-icon {
+    font-size: 22px;
+    line-height: 1;
+    transition: transform 0.2s;
+  }
+
+  .nav-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray);
+    transition: color 0.2s;
+  }
+
+  .nav-btn.active .nav-label { color: var(--accent); }
+  .nav-btn.active .nav-icon  { transform: scale(1.15); }
+
+  /* ── СОБЫТИЯ — заглушка ── */
+  .coming-soon {
+    text-align: center;
+    padding: 50px 20px;
+  }
+
+  .coming-icon { font-size: 52px; margin-bottom: 14px; }
+
+  .coming-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .coming-text { font-size: 14px; color: var(--gray); line-height: 1.5; }
+
+  /* ── КАТАЛОГ ── */
   .grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
+    gap: 12px;
   }
 
   .product-card {
@@ -153,8 +250,7 @@
     overflow: hidden;
     border: 1.5px solid var(--border);
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
+    transition: transform 0.2s;
   }
 
   .product-card:active { transform: scale(0.97); }
@@ -167,7 +263,7 @@
     display: block;
   }
 
-  .product-img-placeholder {
+  .product-img-ph {
     width: 100%;
     aspect-ratio: 1;
     background: var(--light);
@@ -177,225 +273,42 @@
     font-size: 40px;
   }
 
-  .product-info {
-    padding: 10px 12px 12px;
-  }
+  .product-info { padding: 10px 12px 12px; }
 
   .product-name {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 800;
     font-size: 15px;
-    letter-spacing: 0.02em;
     text-transform: uppercase;
-    color: var(--black);
-    line-height: 1.1;
+    letter-spacing: 0.02em;
   }
 
-  .product-colors {
-    display: flex;
-    gap: 5px;
-    margin-top: 7px;
-    flex-wrap: wrap;
-  }
+  .product-colors { display: flex; gap: 5px; margin-top: 6px; }
 
   .color-dot {
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
     border-radius: 50%;
-    border: 1.5px solid rgba(0,0,0,0.15);
+    border: 1.5px solid rgba(0,0,0,0.12);
   }
 
   .product-price {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: 15px;
-    color: var(--accent);
-    margin-top: 6px;
-  }
-
-  /* ── PRODUCT DETAIL ── */
-  .detail-screen {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: var(--white);
-    z-index: 200;
-    overflow-y: auto;
-    animation: slideUp 0.25s ease;
-  }
-
-  .detail-screen.active { display: block; }
-
-  @keyframes slideUp {
-    from { transform: translateY(30px); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
-  }
-
-  .detail-header {
-    display: flex;
-    align-items: center;
-    padding: 14px 20px;
-    gap: 12px;
-    border-bottom: 1.5px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: var(--white);
-    z-index: 10;
-  }
-
-  .back-btn {
-    background: none;
-    border: 1.5px solid var(--border);
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 18px;
-    color: var(--black);
-    transition: background 0.15s;
-  }
-
-  .back-btn:active { background: var(--light); }
-
-  .detail-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-
-  .detail-img {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    background: var(--light);
-    display: block;
-    transition: opacity 0.2s;
-  }
-
-  .detail-img-placeholder {
-    width: 100%;
-    aspect-ratio: 1;
-    background: var(--light);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 80px;
-  }
-
-  .detail-body {
-    padding: 20px;
-  }
-
-  .detail-name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900;
-    font-size: 28px;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    line-height: 1;
-  }
-
-  .detail-price {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 22px;
-    color: var(--accent);
-    margin-top: 4px;
-  }
-
-  .detail-desc {
     font-size: 14px;
-    color: var(--gray);
-    line-height: 1.5;
-    margin-top: 12px;
+    color: var(--accent);
+    margin-top: 5px;
   }
 
-  .section-label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 11px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--gray);
-    margin-top: 20px;
-    margin-bottom: 10px;
-  }
-
-  .color-options {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .color-option {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
-  }
-
-  .color-swatch {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 2.5px solid transparent;
-    transition: border-color 0.15s, transform 0.15s;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
-  }
-
-  .color-option.selected .color-swatch {
-    border-color: var(--accent);
-    transform: scale(1.1);
-  }
-
-  .color-label {
-    font-size: 11px;
-    color: var(--gray);
-    font-weight: 500;
-  }
-
-  .add-btn {
-    width: 100%;
-    margin-top: 24px;
-    padding: 16px;
-    background: var(--accent);
-    color: var(--white);
-    border: none;
-    border-radius: 14px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 800;
-    font-size: 16px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.15s;
-  }
-
-  .add-btn:active { transform: scale(0.98); }
-  .add-btn:disabled { background: var(--gray); cursor: default; }
-
-  .add-btn.added {
-    background: #2d6a4f;
-  }
-
-  /* ── CART ── */
-  .cart-empty {
+  /* ── КОРЗИНА ── */
+  .empty-state {
     text-align: center;
     padding: 60px 20px;
   }
 
-  .cart-empty-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
-  }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
 
-  .cart-empty-text {
+  .empty-text {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
     font-size: 18px;
@@ -404,36 +317,36 @@
     color: var(--gray);
   }
 
-  .cart-items { display: flex; flex-direction: column; gap: 12px; }
+  .cart-list { display: flex; flex-direction: column; gap: 10px; }
 
   .cart-item {
     background: var(--card-bg);
     border: 1.5px solid var(--border);
     border-radius: 14px;
-    padding: 14px;
+    padding: 12px;
     display: flex;
     align-items: center;
     gap: 12px;
   }
 
   .cart-item-img {
-    width: 64px;
-    height: 64px;
+    width: 60px;
+    height: 60px;
     border-radius: 10px;
     object-fit: cover;
     background: var(--light);
     flex-shrink: 0;
   }
 
-  .cart-item-img-placeholder {
-    width: 64px;
-    height: 64px;
+  .cart-item-img-ph {
+    width: 60px;
+    height: 60px;
     border-radius: 10px;
     background: var(--light);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 22px;
     flex-shrink: 0;
   }
 
@@ -444,54 +357,56 @@
     font-weight: 800;
     font-size: 15px;
     text-transform: uppercase;
-    letter-spacing: 0.02em;
   }
 
-  .cart-item-detail {
+  .cart-item-color {
     font-size: 13px;
     color: var(--gray);
     margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
   }
 
   .cart-item-price {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 700;
-    font-size: 15px;
+    font-size: 14px;
     color: var(--accent);
-    margin-top: 4px;
+    margin-top: 3px;
   }
 
   .remove-btn {
     background: none;
     border: 1.5px solid var(--border);
     border-radius: 8px;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
     color: var(--gray);
     flex-shrink: 0;
-    transition: background 0.15s, color 0.15s;
+    transition: background 0.15s;
   }
 
-  .remove-btn:active { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+  .remove-btn:active { background: #fee2e2; color: #dc2626; }
 
   .cart-footer {
-    margin-top: 20px;
-    padding: 16px;
+    margin-top: 16px;
     background: var(--card-bg);
     border: 1.5px solid var(--border);
     border-radius: 14px;
+    padding: 16px;
   }
 
   .cart-total {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 14px;
+    margin-bottom: 10px;
   }
 
   .cart-total-label {
@@ -506,21 +421,20 @@
   .cart-total-price {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 900;
-    font-size: 24px;
-    color: var(--black);
+    font-size: 22px;
   }
 
   .cart-note {
     font-size: 12px;
     color: var(--gray);
     text-align: center;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     line-height: 1.4;
   }
 
   .checkout-btn {
     width: 100%;
-    padding: 16px;
+    padding: 15px;
     background: var(--black);
     color: var(--white);
     border: none;
@@ -536,14 +450,256 @@
 
   .checkout-btn:active { transform: scale(0.98); }
 
-  /* ── SUCCESS ── */
-  .success-screen {
+  /* ── ДЕТАЛЬНАЯ СТРАНИЦА ── */
+  .overlay {
     display: none;
-    text-align: center;
-    padding: 60px 30px;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--white);
+    overflow-y: auto;
+    animation: slideUp 0.25s ease;
   }
 
-  .success-screen.active { display: block; }
+  .overlay.active { display: block; }
+
+  @keyframes slideUp {
+    from { transform: translateY(40px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .overlay-header {
+    position: sticky;
+    top: 0;
+    background: var(--white);
+    border-bottom: 1.5px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10;
+  }
+
+  .back-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+
+  .back-btn:active { background: var(--light); }
+
+  .overlay-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .detail-img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: var(--light);
+    display: block;
+    transition: opacity 0.2s;
+  }
+
+  .detail-img-ph {
+    width: 100%;
+    aspect-ratio: 1;
+    background: var(--light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 80px;
+  }
+
+  .detail-body { padding: 20px 16px 100px; }
+
+  .detail-name {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 32px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+
+  .detail-price {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: var(--accent);
+    margin-top: 4px;
+  }
+
+  .detail-desc {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.55;
+    margin-top: 12px;
+  }
+
+  .section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin: 20px 0 10px;
+  }
+
+  .color-options { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  .color-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+
+  .color-swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2.5px solid transparent;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+    transition: border-color 0.15s, transform 0.15s;
+  }
+
+  .color-option.selected .color-swatch {
+    border-color: var(--accent);
+    transform: scale(1.12);
+  }
+
+  .color-label { font-size: 11px; color: var(--gray); font-weight: 500; }
+
+  .add-btn {
+    width: 100%;
+    margin-top: 24px;
+    padding: 16px;
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    border-radius: 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.2s;
+  }
+
+  .add-btn:active   { transform: scale(0.98); }
+  .add-btn:disabled { background: var(--gray); cursor: default; }
+  .add-btn.added    { background: #2d6a4f; }
+
+  /* ── СКАНЕР ── */
+  .scanner-wrap {
+    text-align: center;
+    padding: 40px 20px;
+  }
+
+  .scanner-icon { font-size: 56px; margin-bottom: 16px; }
+
+  .scanner-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .scanner-text {
+    font-size: 14px;
+    color: var(--gray);
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+
+  .scan-btn {
+    padding: 14px 32px;
+    background: var(--accent);
+    color: var(--white);
+    border: none;
+    border-radius: 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+
+  .scan-btn:active { transform: scale(0.97); }
+
+  .scan-result {
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    text-align: center;
+    display: none;
+  }
+
+  .scan-result.ok    { background: #d1fae5; color: #065f46; }
+  .scan-result.error { background: #fee2e2; color: #991b1b; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: calc(var(--nav-h) + 12px);
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--black);
+    color: var(--white);
+    padding: 9px 18px;
+    border-radius: 50px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 999;
+    pointer-events: none;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── SUCCESS ── */
+  .success-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--white);
+    z-index: 400;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+  }
+
+  .success-overlay.active { display: flex; }
 
   .success-icon {
     font-size: 64px;
@@ -563,257 +719,284 @@
     font-size: 28px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--black);
     margin-bottom: 8px;
   }
 
-  .success-text {
-    font-size: 15px;
-    color: var(--gray);
-    line-height: 1.5;
-  }
-
-  /* ── TOAST ── */
-  .toast {
-    position: fixed;
-    bottom: 90px;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background: var(--black);
-    color: var(--white);
-    padding: 10px 20px;
-    border-radius: 50px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 700;
-    font-size: 14px;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.2s, transform 0.2s;
-    z-index: 999;
-    pointer-events: none;
-  }
-
-  .toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
+  .success-text { font-size: 15px; color: var(--gray); line-height: 1.5; }
 </style>
 </head>
 <body>
+<div class="app">
 
-<!-- HEADER -->
-<div class="header">
-  <div class="logo">
-    <span>Expat Community</span>
-    Sportiki
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">
+      <span>Expat Community</span>
+      Sportiki
+    </div>
   </div>
-  <button class="cart-btn" id="cartBtn" onclick="showCart()">
-    🛒 Корзина
-    <span class="cart-count" id="cartCount">0</span>
-  </button>
+
+  <!-- ПОДВКЛАДКИ МЕРЧА (показываются только на экране мерча) -->
+  <div class="merch-tabs" id="merchTabs">
+    <button class="merch-tab active" id="mtab-catalog" onclick="goMerchTab('catalog')">
+      Каталог
+    </button>
+    <button class="merch-tab" id="mtab-cart" onclick="goMerchTab('cart')">
+      Корзина
+      <span class="tab-badge" id="cartBadge">0</span>
+    </button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- СОБЫТИЯ -->
+    <div class="screen active" id="screen-events">
+      <div class="screen-title">События</div>
+      <div class="screen-sub">Активности экспат-комьюнити Da Nang</div>
+      <div class="coming-soon">
+        <div class="coming-icon">🗓</div>
+        <div class="coming-title">Скоро здесь!</div>
+        <div class="coming-text">Список событий и запись на активности<br>появятся в ближайшее время.</div>
+      </div>
+    </div>
+
+    <!-- МЕРЧ -->
+    <div class="screen" id="screen-merch">
+
+      <!-- Каталог -->
+      <div class="merch-sub active" id="msub-catalog">
+        <div class="grid" id="productGrid"></div>
+      </div>
+
+      <!-- Корзина -->
+      <div class="merch-sub" id="msub-cart">
+        <div id="cartContent"></div>
+      </div>
+
+    </div>
+
+    <!-- СКАНЕР (только для админов) -->
+    <div class="screen" id="screen-scanner">
+      <div class="screen-title">Сканер</div>
+      <div class="screen-sub">Проверка билетов участников</div>
+      <div class="scanner-wrap">
+        <div class="scanner-icon">📷</div>
+        <div class="scanner-title">QR-сканер билетов</div>
+        <div class="scanner-text">Наведи камеру на QR-код участника для проверки его записи на мероприятие</div>
+        <button class="scan-btn" onclick="startScan()">Сканировать</button>
+        <div class="scan-result" id="scanResult"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-btn active" id="nav-events" onclick="goScreen('events')">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">События</span>
+    </button>
+    <button class="nav-btn" id="nav-merch" onclick="goScreen('merch')">
+      <span class="nav-icon">👕</span>
+      <span class="nav-label">Мерч</span>
+    </button>
+    <!-- Сканер добавляется динамически только для админов -->
+  </nav>
+
 </div>
 
-<!-- TABS -->
-<div class="tabs" id="mainTabs">
-  <button class="tab active" onclick="showTab('shop')">Каталог</button>
-  <button class="tab" onclick="showTab('cart')">Моя корзина</button>
-</div>
-
-<!-- SHOP SCREEN -->
-<div class="screen active" id="shopScreen">
-  <div class="grid" id="productGrid"></div>
-</div>
-
-<!-- CART SCREEN -->
-<div class="screen" id="cartScreen">
-  <div id="cartContent"></div>
-</div>
-
-<!-- PRODUCT DETAIL -->
-<div class="detail-screen" id="detailScreen">
-  <div class="detail-header">
+<!-- ДЕТАЛЬНАЯ СТРАНИЦА ТОВАРА -->
+<div class="overlay" id="detailOverlay">
+  <div class="overlay-header">
     <button class="back-btn" onclick="closeDetail()">←</button>
-    <div class="detail-title" id="detailTitle"></div>
+    <div class="overlay-title" id="detailTitle"></div>
   </div>
-  <div id="detailImg"></div>
+  <div id="detailImgWrap"></div>
   <div class="detail-body">
-    <div class="detail-name" id="detailName"></div>
+    <div class="detail-name"  id="detailName"></div>
     <div class="detail-price" id="detailPrice"></div>
-    <div class="detail-desc" id="detailDesc"></div>
+    <div class="detail-desc"  id="detailDesc"></div>
     <div class="section-label">Выбери цвет</div>
     <div class="color-options" id="colorOptions"></div>
-    <button class="add-btn" id="addBtn" onclick="addToCart()" disabled>Выбери цвет</button>
+    <button class="add-btn" id="addBtn" disabled onclick="addToCart()">Выбери цвет</button>
   </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-icon">🎉</div>
+  <div class="success-title">Заявка оформлена!</div>
+  <div class="success-text">Наш менеджер свяжется с тобой<br>для уточнения деталей.</div>
 </div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ── UTILS ──
-function formatPrice(p) { return p.toLocaleString("ru-RU") + " ₫"; }
+// ── КОНФИГ ──
+const ADMIN_IDS = ['1771173222', '1397144271'];
 
-// ── DATA ──
+// ── ТОВАРЫ ──
 const PRODUCTS = [
   {
     id: 'tshirt',
-    name: 'T-Shirt',
-    price: 350000,
-    currency: 'VND',
-    description: 'Оверсайз футболка с принтом Sportiki. 100% хлопок, унисекс. Подходит для тренировок и повседневной носки.',
+    name: 'Футболка',
+    price: 590000,
     emoji: '👕',
+    description: 'Оверсайз футболка с принтом Sportiki. 100% хлопок, унисекс. Подходит для тренировок и повседневной носки.',
     colors: [
-      { name: 'White',  hex: '#f5f3ef', img: 'images/tshirt-white.PNG' },
-      { name: 'Pink',   hex: '#e8a0b0', img: 'images/tshirt-pink.PNG' },
-      { name: 'Slate',  hex: '#3d4f6b', img: 'images/tshirt-slate.PNG' },
+      { name: 'Белый',       hex: '#f5f3ef', img: 'images/tshirt-white.png' },
+      { name: 'Розовый',     hex: '#e8a0b0', img: 'images/tshirt-pink.png'  },
+      { name: 'Тёмно-синий', hex: '#3d4f6b', img: 'images/tshirt-slate.png' },
     ]
   },
   {
     id: 'tank',
-    name: 'Tank Top',
-    price: 350000,
-    currency: 'VND',
-    description: 'Лёгкая майка без рукавов с принтом Sportiki. Унисекс. Идеально для пляжа и тренировок.',
+    name: 'Майка',
+    price: 490000,
     emoji: '🎽',
+    description: 'Лёгкая майка без рукавов с принтом Sportiki. Унисекс. Идеально для пляжа и тренировок.',
     colors: [
-      { name: 'White', hex: '#f5f3ef', img: 'images/tank-white.PNG' },
-      { name: 'Black', hex: '#0d0d0d', img: 'images/tank-black.PNG' },
+      { name: 'Белый', hex: '#f5f3ef', img: 'images/tank-white.png' },
+      { name: 'Чёрный', hex: '#0d0d0d', img: 'images/tank-black.png' },
     ]
   }
 ];
 
-let cart = [];
+// ── СОСТОЯНИЕ ──
+let cart           = [];
 let currentProduct = null;
-let selectedColor = null;
+let selectedColor  = null;
+let currentScreen  = 'events';
+let currentMerchTab = 'catalog';
 
-// ── INIT ──
+// ── ИНИЦИАЛИЗАЦИЯ ──
 window.addEventListener('load', () => {
   if (window.Telegram?.WebApp) {
     Telegram.WebApp.ready();
     Telegram.WebApp.expand();
+    const uid = String(Telegram.WebApp.initDataUnsafe?.user?.id || '');
+    if (ADMIN_IDS.includes(uid)) addScannerTab();
   }
   renderProducts();
 });
 
-// ── RENDER PRODUCTS ──
-function renderProducts() {
-  const grid = document.getElementById('productGrid');
-  grid.innerHTML = PRODUCTS.map(p => {
-    const firstColor = p.colors[0];
-    const dots = p.colors.map(c =>
-      `<div class="color-dot" style="background:${c.hex}"></div>`
-    ).join('');
-
-    const imgEl = `<img class="product-img" src="${firstColor.img}"
-      onerror="this.outerHTML='<div class=product-img-placeholder>${p.emoji}</div>'"
-      alt="${p.name}">`;
-
-    return `
-      <div class="product-card" onclick="openDetail('${p.id}')">
-        ${imgEl}
-        <div class="product-info">
-          <div class="product-name">${p.name}</div>
-          <div class="product-colors">${dots}</div>
-          <div class="product-price">${formatPrice(p.price)}</div>
-        </div>
-      </div>`;
-  }).join('');
+function addScannerTab() {
+  const nav = document.getElementById('bottomNav');
+  const btn = document.createElement('button');
+  btn.className = 'nav-btn';
+  btn.id        = 'nav-scanner';
+  btn.innerHTML = '<span class="nav-icon">🎫</span><span class="nav-label">Сканер</span>';
+  btn.onclick   = () => goScreen('scanner');
+  nav.appendChild(btn);
 }
 
-// ── TABS ──
-function showTab(tab) {
-  document.querySelectorAll('.tab').forEach((t, i) => {
-    t.classList.toggle('active', (i === 0) === (tab === 'shop'));
-  });
-  document.getElementById('shopScreen').classList.toggle('active', tab === 'shop');
-  document.getElementById('cartScreen').classList.toggle('active', tab === 'cart');
+// ── ГЛАВНАЯ НАВИГАЦИЯ ──
+function goScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`screen-${name}`)?.classList.add('active');
+  document.getElementById(`nav-${name}`)?.classList.add('active');
+  currentScreen = name;
+
+  // Показываем подвкладки только на экране мерча
+  document.getElementById('merchTabs').classList.toggle('visible', name === 'merch');
+}
+
+// ── ПОДВКЛАДКИ МЕРЧА ──
+function goMerchTab(tab) {
+  document.querySelectorAll('.merch-sub').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.merch-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(`msub-${tab}`)?.classList.add('active');
+  document.getElementById(`mtab-${tab}`)?.classList.add('active');
+  currentMerchTab = tab;
+
   if (tab === 'cart') renderCart();
 }
 
-function showCart() { showTab('cart'); }
+// ── ПРОДУКТЫ ──
+function renderProducts() {
+  document.getElementById('productGrid').innerHTML = PRODUCTS.map(p => `
+    <div class="product-card" onclick="openDetail('${p.id}')">
+      <img class="product-img" src="${p.colors[0].img}"
+        onerror="this.outerHTML='<div class=product-img-ph>${p.emoji}</div>'"
+        alt="${p.name}">
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-colors">
+          ${p.colors.map(c => `<div class="color-dot" style="background:${c.hex}"></div>`).join('')}
+        </div>
+        <div class="product-price">${fmt(p.price)}</div>
+      </div>
+    </div>`).join('');
+}
 
-// ── PRODUCT DETAIL ──
+// ── ДЕТАЛЬНАЯ СТРАНИЦА ──
 function openDetail(id) {
   currentProduct = PRODUCTS.find(p => p.id === id);
-  selectedColor = null;
+  selectedColor  = null;
 
   document.getElementById('detailTitle').textContent = currentProduct.name;
-  document.getElementById('detailName').textContent = currentProduct.name;
-  document.getElementById('detailPrice').textContent = `${formatPrice(currentProduct.price)}`;
-  document.getElementById('detailDesc').textContent = currentProduct.description;
+  document.getElementById('detailName').textContent  = currentProduct.name;
+  document.getElementById('detailPrice').textContent = fmt(currentProduct.price);
+  document.getElementById('detailDesc').textContent  = currentProduct.description;
 
-  // Image
-  const imgDiv = document.getElementById('detailImg');
-  imgDiv.innerHTML = `<img class="detail-img" id="detailMainImg"
-    src="${currentProduct.colors[0].img}"
-    onerror="this.outerHTML='<div class=detail-img-placeholder>${currentProduct.emoji}</div>'"
-    alt="${currentProduct.name}">`;
+  document.getElementById('detailImgWrap').innerHTML =
+    `<img class="detail-img" id="detailMainImg" src="${currentProduct.colors[0].img}"
+      onerror="this.outerHTML='<div class=detail-img-ph>${currentProduct.emoji}</div>'"
+      alt="${currentProduct.name}">`;
 
-  // Colors
-  const colorDiv = document.getElementById('colorOptions');
-  colorDiv.innerHTML = currentProduct.colors.map((c, i) => `
-    <div class="color-option" onclick="selectColor(${i})" id="colorOpt${i}">
-      <div class="color-swatch" style="background:${c.hex}"></div>
-      <div class="color-label">${c.name}</div>
-    </div>`).join('');
+  document.getElementById('colorOptions').innerHTML =
+    currentProduct.colors.map((c, i) => `
+      <div class="color-option" onclick="selectColor(${i})">
+        <div class="color-swatch" style="background:${c.hex}"></div>
+        <div class="color-label">${c.name}</div>
+      </div>`).join('');
 
-  const addBtn = document.getElementById('addBtn');
-  addBtn.disabled = true;
-  addBtn.textContent = 'Выбери цвет';
-  addBtn.className = 'add-btn';
+  const btn = document.getElementById('addBtn');
+  btn.disabled    = true;
+  btn.textContent = 'Выбери цвет';
+  btn.className   = 'add-btn';
 
-  document.getElementById('detailScreen').classList.add('active');
+  document.getElementById('detailOverlay').classList.add('active');
 }
 
 function closeDetail() {
-  document.getElementById('detailScreen').classList.remove('active');
+  document.getElementById('detailOverlay').classList.remove('active');
   currentProduct = null;
-  selectedColor = null;
+  selectedColor  = null;
 }
 
 function selectColor(idx) {
   selectedColor = currentProduct.colors[idx];
+  document.querySelectorAll('.color-option').forEach((el, i) =>
+    el.classList.toggle('selected', i === idx));
 
-  document.querySelectorAll('.color-option').forEach((el, i) => {
-    el.classList.toggle('selected', i === idx);
-  });
-
-  // Update main image
   const img = document.getElementById('detailMainImg');
   if (img) {
     img.style.opacity = '0.5';
     img.src = selectedColor.img;
-    img.onload = () => { img.style.opacity = '1'; };
+    img.onload  = () => { img.style.opacity = '1'; };
     img.onerror = () => {
-      img.outerHTML = `<div class="detail-img-placeholder">${currentProduct.emoji}</div>`;
+      img.outerHTML = `<div class="detail-img-ph">${currentProduct.emoji}</div>`;
     };
   }
 
-  const addBtn = document.getElementById('addBtn');
-  addBtn.disabled = false;
-
-  // Check if already in cart
-  const exists = cart.find(i => i.productId === currentProduct.id && i.color === selectedColor.name);
-  if (exists) {
-    addBtn.textContent = '✓ Уже в корзине';
-    addBtn.className = 'add-btn added';
-  } else {
-    addBtn.textContent = `Добавить в корзину — ${formatPrice(currentProduct.price)}`;
-    addBtn.className = 'add-btn';
-  }
+  const inCart = cart.find(i => i.productId === currentProduct.id && i.color === selectedColor.name);
+  const btn    = document.getElementById('addBtn');
+  btn.disabled    = false;
+  btn.className   = inCart ? 'add-btn added' : 'add-btn';
+  btn.textContent = inCart ? '✓ Уже в корзине' : `Добавить — ${fmt(currentProduct.price)}`;
 }
 
-// ── CART ──
+// ── КОРЗИНА ──
 function addToCart() {
   if (!selectedColor) return;
-
-  const exists = cart.find(i => i.productId === currentProduct.id && i.color === selectedColor.name);
-  if (exists) {
-    showToast('Уже в корзине');
+  if (cart.find(i => i.productId === currentProduct.id && i.color === selectedColor.name)) {
+    showToast('Уже в корзине!');
     return;
   }
-
   cart.push({
     productId: currentProduct.id,
     name:      currentProduct.name,
@@ -823,114 +1006,108 @@ function addToCart() {
     emoji:     currentProduct.emoji,
     price:     currentProduct.price,
   });
-
-  updateCartBadge();
+  updateBadge();
   showToast(`${currentProduct.name} (${selectedColor.name}) добавлен!`);
-
-  const addBtn = document.getElementById('addBtn');
-  addBtn.textContent = '✓ В корзине';
-  addBtn.className = 'add-btn added';
+  const btn = document.getElementById('addBtn');
+  btn.className   = 'add-btn added';
+  btn.textContent = '✓ В корзине';
 }
 
 function removeFromCart(idx) {
   cart.splice(idx, 1);
-  updateCartBadge();
+  updateBadge();
   renderCart();
 }
 
-function updateCartBadge() {
-  const btn  = document.getElementById('cartBtn');
-  const badge = document.getElementById('cartCount');
+function updateBadge() {
+  const badge = document.getElementById('cartBadge');
   badge.textContent = cart.length;
-  btn.classList.toggle('has-items', cart.length > 0);
+  badge.classList.toggle('visible', cart.length > 0);
 }
 
 function renderCart() {
   const el = document.getElementById('cartContent');
-
-  if (cart.length === 0) {
-    el.innerHTML = `
-      <div class="cart-empty">
-        <div class="cart-empty-icon">🛒</div>
-        <div class="cart-empty-text">Корзина пуста</div>
-      </div>`;
+  if (!cart.length) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🛒</div>
+      <div class="empty-text">Корзина пуста</div>
+    </div>`;
     return;
   }
 
-  const total = cart.reduce((sum, i) => sum + i.price, 0);
-
-  const items = cart.map((item, idx) => {
-    const imgEl = `<img class="cart-item-img" src="${item.img}"
-      onerror="this.outerHTML='<div class=cart-item-img-placeholder>${item.emoji}</div>'"
-      alt="${item.name}">`;
-
-    return `
-      <div class="cart-item">
-        ${imgEl}
-        <div class="cart-item-info">
-          <div class="cart-item-name">${item.name}</div>
-          <div class="cart-item-detail">
-            <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${item.colorHex};border:1px solid rgba(0,0,0,0.15);vertical-align:middle;margin-right:4px"></span>
-            ${item.color}
-          </div>
-          <div class="cart-item-price">${formatPrice(item.price)}</div>
-        </div>
-        <button class="remove-btn" onclick="removeFromCart(${idx})">✕</button>
-      </div>`;
-  }).join('');
-
+  const total = cart.reduce((s, i) => s + i.price, 0);
   el.innerHTML = `
-    <div class="cart-items">${items}</div>
+    <div class="cart-list">
+      ${cart.map((item, idx) => `
+        <div class="cart-item">
+          <img class="cart-item-img" src="${item.img}"
+            onerror="this.outerHTML='<div class=cart-item-img-ph>${item.emoji}</div>'"
+            alt="${item.name}">
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-color">
+              <span style="width:10px;height:10px;border-radius:50%;background:${item.colorHex};
+                border:1px solid rgba(0,0,0,0.12);display:inline-block;flex-shrink:0"></span>
+              ${item.color}
+            </div>
+            <div class="cart-item-price">${fmt(item.price)}</div>
+          </div>
+          <button class="remove-btn" onclick="removeFromCart(${idx})">✕</button>
+        </div>`).join('')}
+    </div>
     <div class="cart-footer">
       <div class="cart-total">
         <div class="cart-total-label">Итого</div>
-        <div class="cart-total-price">${formatPrice(total)}</div>
+        <div class="cart-total-price">${fmt(total)}</div>
       </div>
-      <div class="cart-note">После оформления заявки наш менеджер свяжется с тобой для уточнения деталей и доставки.</div>
+      <div class="cart-note">После оформления заявки наш менеджер свяжется с тобой для уточнения деталей.</div>
       <button class="checkout-btn" onclick="checkout()">✓ Оформить заявку</button>
     </div>`;
 }
 
-// ── CHECKOUT ──
+// ── ОФОРМЛЕНИЕ ──
 function checkout() {
-  if (cart.length === 0) return;
-
+  if (!cart.length) return;
   const orderData = {
     items: cart.map(i => ({ name: i.name, color: i.color, price: i.price })),
-    total: cart.reduce((sum, i) => sum + i.price, 0),
+    total: cart.reduce((s, i) => s + i.price, 0),
   };
-
   if (window.Telegram?.WebApp) {
     Telegram.WebApp.sendData(JSON.stringify(orderData));
+  }
+  cart = [];
+  updateBadge();
+  goMerchTab('catalog');
+  document.getElementById('successOverlay').classList.add('active');
+}
+
+// ── СКАНЕР ──
+function startScan() {
+  if (window.Telegram?.WebApp) {
+    Telegram.WebApp.showScanQrPopup({ text: 'Наведи камеру на QR-код билета' }, (data) => {
+      Telegram.WebApp.closeScanQrPopup();
+      showScanResult(data);
+    });
   } else {
-    // Dev mode — show success
-    showSuccess();
+    showScanResult('TEST-TICKET-123');
   }
 }
 
-function showSuccess() {
-  document.getElementById('mainTabs').style.display = 'none';
-  document.getElementById('shopScreen').classList.remove('active');
-  document.getElementById('cartScreen').classList.remove('active');
-
-  const body = document.body;
-  const success = document.createElement('div');
-  success.className = 'success-screen active';
-  success.innerHTML = `
-    <div class="success-icon">🎉</div>
-    <div class="success-title">Заявка оформлена!</div>
-    <div class="success-text">Наш менеджер скоро свяжется с тобой<br>для уточнения деталей.</div>`;
-  body.appendChild(success);
-  cart = [];
-  updateCartBadge();
+function showScanResult(data) {
+  const el = document.getElementById('scanResult');
+  el.style.display = 'block';
+  el.className   = 'scan-result ok';
+  el.textContent = `✅ Билет принят`;
 }
 
-// ── TOAST ──
+// ── УТИЛИТЫ ──
+function fmt(p) { return p.toLocaleString('ru-RU') + ' ₫'; }
+
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  setTimeout(() => t.classList.remove('show'), 2200);
 }
 </script>
 </body>
