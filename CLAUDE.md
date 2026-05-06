@@ -48,10 +48,10 @@ sportiki/
 │   │   │   ├── Admin.js
 │   │   │   ├── Main.js
 │   │   │   ├── Reminders.js
-│   │   │   └── Setup.js
+│   │   │   │── Setup.js
+│   │   │   └── appsscript.json
 │   │   ├── .clasp.dev.json
 │   │   ├── .clasp.prod.json
-│   │   ├── appsscript.json
 │   │   └── package.json        ← clasp скрипты для бота
 │   │
 │   └── api/                    ← GAS REST API (строим параллельно)
@@ -63,10 +63,10 @@ sportiki/
 │       │   ├── EventsController.js
 │       │   ├── RegistrationsController.js
 │       │   ├── UsersController.js
-│       │   └── Response.js     ← helpers: ok(), error()
+│       │   ├── Response.js     ← helpers: ok(), error()
+│       │   └── appsscript.json
 │       ├── .clasp.dev.json
 │       ├── .clasp.prod.json
-│       ├── appsscript.json
 │       └── package.json        ← clasp скрипты для API
 │
 ├── .github/
