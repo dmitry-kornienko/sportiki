@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "push:dev":   "node -e \"require('fs').copyFileSync('.clasp.dev.json','.clasp.json')\" && npx clasp push",
-    "push:prod":  "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && npx clasp push",
-    "deploy":     "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && npx clasp push && npx clasp deploy",
+    "push:dev":    "node -e \"require('fs').copyFileSync('.clasp.dev.json','.clasp.json')\" && npx clasp push",
+    "push:prod":   "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && npx clasp push",
+    "deploy:dev":  "node -e \"require('fs').copyFileSync('.clasp.dev.json','.clasp.json')\" && npx clasp push --force && node redeploy.js",
+    "deploy:prod": "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && npx clasp push --force && node redeploy.js",
+    "deploy":      "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && npx clasp push && npx clasp deploy",
     "open:dev":   "node -e \"require('fs').copyFileSync('.clasp.dev.json','.clasp.json')\" && npx clasp open",
     "open:prod":  "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && npx clasp open",
     "logs":       "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && npx clasp logs"
