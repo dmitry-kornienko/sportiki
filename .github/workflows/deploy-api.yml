@@ -1,0 +1,29 @@
+name: Deploy API to GAS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'gas/api/src/**'   # только если изменился код API
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install clasp
+        run: npm install -g @google/clasp
+
+      - name: Authenticate clasp
+        run: echo '${{ secrets.CLASP_CREDENTIALS }}' > ~/.clasprc.json
+
+      - name: Deploy API
+        run: cd gas/api && npm run deploy

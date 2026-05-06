@@ -1,0 +1,29 @@
+name: Deploy Bot to GAS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'gas/bot/src/**'   # только если изменился код бота
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install clasp
+        run: npm install -g @google/clasp
+
+      - name: Authenticate clasp
+        run: echo '${{ secrets.CLASP_CREDENTIALS }}' > ~/.clasprc.json
+
+      - name: Deploy bot
+        run: cd gas/bot && npm run deploy

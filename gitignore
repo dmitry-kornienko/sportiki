@@ -1,0 +1,30 @@
+# Активный clasp конфиг (меняется локально)
+gas/bot/.clasp.json
+gas/api/.clasp.json
+
+# Переменные окружения
+.env
+.env.local
+.env.dev
+.env.prod
+miniapp/.env.local
+miniapp/.env.development.local
+miniapp/.env.production.local
+
+# Зависимости
+node_modules/
+miniapp/node_modules/
+
+# Сборка
+miniapp/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# Clasp credentials (глобальные, не в репо)
+.clasprc.json

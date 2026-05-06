@@ -1,0 +1,16 @@
+{
+  "name": "sportiki-gas-bot",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "push:dev":   "cp .clasp.dev.json .clasp.json && clasp push",
+    "push:prod":  "cp .clasp.prod.json .clasp.json && clasp push",
+    "deploy":     "cp .clasp.prod.json .clasp.json && clasp push && clasp deploy",
+    "open:dev":   "cp .clasp.dev.json .clasp.json && clasp open",
+    "open:prod":  "cp .clasp.prod.json .clasp.json && clasp open",
+    "logs":       "cp .clasp.prod.json .clasp.json && clasp logs"
+  },
+  "devDependencies": {
+    "@google/clasp": "^2.4.2"
+  }
+}
