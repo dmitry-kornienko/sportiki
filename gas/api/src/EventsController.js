@@ -44,14 +44,23 @@ const EventsController = {
 		if (!event) return Response.error('Событие не найдено', 404)
 
 		const regs = db.getRegsByEvent(id)
-		const mainCount = regs.filter(r => r.status === REG_STATUS.MAIN).length
+		const mainRegs = regs.filter(r => r.status === REG_STATUS.MAIN)
+		const mainCount = mainRegs.length
 		const totalCount = regs.length
+
+		const participants = mainRegs.map(r => ({
+			name: r.name,
+			username: r.username,
+			isGuest: r.isGuest,
+			confirmed: r.confirmed,
+		}))
 
 		return Response.ok({
 			...event,
 			mainCount,
 			totalCount,
 			isFull: event.maxPeople > 0 && mainCount >= event.maxPeople,
+			participants,
 		})
 	},
 }

@@ -24,7 +24,11 @@ export function useEvents() {
 	}
 
 	function getRegStatus(eventId: string): 'MAIN' | 'RESERVE' | null {
-		return registrations.find(r => r.eventId === eventId)?.status ?? null
+		return registrations.find(r => r.eventId === eventId && !r.isGuest)?.status ?? null
+	}
+
+	function getGuestReg(eventId: string): Registration | null {
+		return registrations.find(r => r.eventId === eventId && r.isGuest) ?? null
 	}
 
 	function updateEvent(updated: Event) {
@@ -36,7 +40,19 @@ export function useEvents() {
 	}
 
 	function removeRegistration(eventId: string) {
-		setRegistrations(prev => prev.filter(r => r.eventId !== eventId))
+		setRegistrations(prev => {
+			const idx = prev.findIndex(r => r.eventId === eventId && !r.isGuest)
+			if (idx === -1) return prev
+			return prev.filter((_, i) => i !== idx)
+		})
+	}
+
+	function removeGuestRegistration(eventId: string) {
+		setRegistrations(prev => {
+			const idx = prev.findIndex(r => r.eventId === eventId && r.isGuest)
+			if (idx === -1) return prev
+			return prev.filter((_, i) => i !== idx)
+		})
 	}
 
 	return {
@@ -46,8 +62,10 @@ export function useEvents() {
 		error,
 		isRegistered,
 		getRegStatus,
+		getGuestReg,
 		updateEvent,
 		addRegistration,
 		removeRegistration,
+		removeGuestRegistration,
 	}
 }

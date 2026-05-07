@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function EventsScreen({ onToast }: Props) {
-	const { events, loading, error, isRegistered, getRegStatus, addRegistration, removeRegistration } = useEvents()
+	const { events, loading, error, isRegistered, getRegStatus, getGuestReg, addRegistration, removeRegistration, removeGuestRegistration, updateEvent } = useEvents()
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
 
 	if (loading) return <Loader fullscreen />
@@ -23,6 +23,7 @@ export function EventsScreen({ onToast }: Props) {
 			chatId: getTelegramUserId(),
 			eventId,
 			name: '',
+			username: '',
 			status,
 			isGuest: false,
 		}
@@ -34,8 +35,12 @@ export function EventsScreen({ onToast }: Props) {
 			<EventDetail
 				event={selectedEvent}
 				regStatus={isRegistered(selectedEvent.id) ? getRegStatus(selectedEvent.id) : null}
+				guestReg={getGuestReg(selectedEvent.id)}
 				onRegister={handleRegister}
 				onUnregister={removeRegistration}
+				onGuestRegister={(reg) => addRegistration(reg)}
+				onGuestUnregister={(eventId) => removeGuestRegistration(eventId)}
+				onEventUpdate={updateEvent}
 				onToast={onToast}
 				onBack={() => setSelectedEvent(null)}
 			/>
