@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { fetchEvent } from '../../api/events'
 import { register, unregister, registerGuest, unregisterGuest } from '../../api/registrations'
 import type { Event, Registration } from '../../types'
@@ -376,7 +377,7 @@ export function EventDetail({
 			</div>
 		</div>
 
-		{showGuestModal && (
+		{showGuestModal && createPortal(
 			<>
 				<div className={s.sheetBackdrop} onClick={() => { setShowGuestModal(false); setGuestModalName('') }} />
 				<div className={s.sheet}>
@@ -396,10 +397,11 @@ export function EventDetail({
 						{guestLoading ? <Loader /> : 'Добавить'}
 					</button>
 				</div>
-			</>
+			</>,
+			document.body
 		)}
 
-		{showUnregisterSheet && (
+		{showUnregisterSheet && createPortal(
 			<>
 				<div className={s.sheetBackdrop} onClick={() => setShowUnregisterSheet(false)} />
 				<div className={s.sheet}>
@@ -421,10 +423,11 @@ export function EventDetail({
 						</>
 					)}
 				</div>
-			</>
+			</>,
+			document.body
 		)}
 
-		{showSheet && (
+		{showSheet && createPortal(
 			<>
 				<div className={s.sheetBackdrop} onClick={() => { setShowSheet(false); setSheetGuestName(''); setShowGuestCard(false) }} />
 				<div className={s.sheet}>
@@ -465,7 +468,8 @@ export function EventDetail({
 						</div>
 					)}
 				</div>
-			</>
+			</>,
+			document.body
 		)}
 		</>
 	)
