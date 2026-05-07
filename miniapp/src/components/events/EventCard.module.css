@@ -20,12 +20,6 @@
 	border-left-color: #34d399;
 }
 
-.emoji {
-	font-size: 28px;
-	line-height: 1;
-	flex-shrink: 0;
-}
-
 .info {
 	flex: 1;
 	min-width: 0;
@@ -72,6 +66,12 @@
 .countReserve {
 	font-size: 12px;
 	color: #d97706;
+}
+
+.badgeArea {
+	min-height: 20px;
+	display: flex;
+	align-items: center;
 }
 
 .badge {

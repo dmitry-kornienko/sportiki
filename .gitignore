@@ -19,3 +19,9 @@ Thumbs.db
 
 # Old vanilla prototype
 /index.html
+
+# Claude Code
+.claude/
+
+# Vite cache
+miniapp/.vite/

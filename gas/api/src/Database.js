@@ -44,6 +44,7 @@ const SheetCache = {
 	_ss: null,
 	_sheets: {},
 	_data: {},
+	_displayData: {},
 
 	ss() {
 		if (!this._ss) this._ss = getSpreadsheet()
@@ -64,14 +65,23 @@ const SheetCache = {
 		return this._data[name]
 	},
 
+	displayData(name) {
+		if (!this._displayData[name]) {
+			this._displayData[name] = this.sheet(name).getDataRange().getDisplayValues()
+		}
+		return this._displayData[name]
+	},
+
 	invalidate(name) {
 		delete this._data[name]
+		delete this._displayData[name]
 	},
 
 	clear() {
 		this._ss = null
 		this._sheets = {}
 		this._data = {}
+		this._displayData = {}
 	},
 }
 
@@ -81,10 +91,7 @@ const EventRepository = {
 	_formatDate(value) {
 		if (!value) return ''
 		if (value instanceof Date) {
-			const d = String(value.getDate()).padStart(2, '0')
-			const m = String(value.getMonth() + 1).padStart(2, '0')
-			const y = value.getFullYear()
-			return `${d}.${m}.${y}`
+			return Utilities.formatDate(value, Session.getScriptTimeZone(), 'dd.MM.yyyy')
 		}
 		return value.toString()
 	},
@@ -92,20 +99,20 @@ const EventRepository = {
 	_formatTime(value) {
 		if (!value) return ''
 		if (value instanceof Date) {
-			const h = String(value.getHours()).padStart(2, '0')
-			const min = String(value.getMinutes()).padStart(2, '0')
-			return `${h}:${min}`
+			return Utilities.formatDate(value, Session.getScriptTimeZone(), 'HH:mm')
 		}
 		return value.toString()
 	},
 
-	_rowToEvent(row) {
+	_rowToEvent(row, displayRow) {
 		return {
 			id: row[COL.EVENTS.ID].toString(),
 			type: row[COL.EVENTS.TYPE] ? row[COL.EVENTS.TYPE].toString() : '',
 			title: row[COL.EVENTS.TITLE] ? row[COL.EVENTS.TITLE].toString() : '',
 			date: this._formatDate(row[COL.EVENTS.DATE]),
-			time: this._formatTime(row[COL.EVENTS.TIME]),
+			time: displayRow
+				? displayRow[COL.EVENTS.TIME].substring(0, 5)
+				: this._formatTime(row[COL.EVENTS.TIME]),
 			maxPeople:
 				row[COL.EVENTS.MAX_PEOPLE] !== ''
 					? Number(row[COL.EVENTS.MAX_PEOPLE])
@@ -122,23 +129,26 @@ const EventRepository = {
 
 	getActive() {
 		const data = SheetCache.data(SHEET_NAMES.EVENTS)
+		const displayData = SheetCache.displayData(SHEET_NAMES.EVENTS)
 		return data
 			.slice(1)
-			.filter(row => {
+			.map((row, i) => ({ row, displayRow: displayData[i + 1] }))
+			.filter(({ row }) => {
 				if (!row[COL.EVENTS.ID]) return false
 				const status = row[COL.EVENTS.STATUS]?.toString().trim()
 				return status === EVENT_STATUS.OPEN || status === EVENT_STATUS.CLOSED
 			})
-			.map(row => this._rowToEvent(row))
+			.map(({ row, displayRow }) => this._rowToEvent(row, displayRow))
 			.sort((a, b) => this._parseDate(a.date) - this._parseDate(b.date))
 	},
 
 	findById(id) {
 		const data = SheetCache.data(SHEET_NAMES.EVENTS)
+		const displayData = SheetCache.displayData(SHEET_NAMES.EVENTS)
 		const target = id.toString()
 		for (let i = 1; i < data.length; i++) {
 			if (data[i][COL.EVENTS.ID].toString() === target) {
-				return this._rowToEvent(data[i])
+				return this._rowToEvent(data[i], displayData[i])
 			}
 		}
 		return null
