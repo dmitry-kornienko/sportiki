@@ -1,10 +1,10 @@
-name: Deploy Mini App to GitHub Pages
+name: Deploy Mini App (dev) to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
     paths:
-      - 'miniapp/**'       # только если изменился фронт
+      - 'miniapp/**'
 
 jobs:
   deploy:
@@ -29,12 +29,13 @@ jobs:
       - name: Build
         run: cd miniapp && npm run build
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL_PROD }}
-          VITE_BASE: /sportiki/
+          VITE_API_URL: ${{ secrets.VITE_API_URL_DEV }}
+          VITE_BASE: /sportiki/dev/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: miniapp/dist
+          destination_dir: dev
           keep_files: true
