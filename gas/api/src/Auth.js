@@ -35,14 +35,19 @@ const Auth = {
 				.map(([k, v]) => `${k}=${v}`)
 				.join('\n')
 
-			// HMAC-SHA256
+			// Step 1: secret_key = HMAC(key="WebAppData", data=bot_token)
 			const secretKey = Utilities.computeHmacSha256Signature(
-				'WebAppData',
 				getBotToken(),
+				'WebAppData',
 			)
 
-			const expectedHash = Utilities.computeHmacSha256Signature(
-				dataCheckString,
+			// Step 2: hash = HMAC(key=secret_key, data=data_check_string)
+			// Используем Byte[] для обоих аргументов — иначе GAS кодирует ключ в UTF-8
+			// и байты > 127 дают неверный результат
+			const dataBytes = Utilities.newBlob(dataCheckString).getBytes()
+			const expectedHash = Utilities.computeHmacSignature(
+				Utilities.MacAlgorithm.HMAC_SHA_256,
+				dataBytes,
 				secretKey,
 			)
 
@@ -50,7 +55,10 @@ const Auth = {
 				.map(b => ('0' + (b & 0xff).toString(16)).slice(-2))
 				.join('')
 
-			if (expectedHex !== hash) return null
+			if (expectedHex !== hash) {
+				console.error('Auth hash mismatch. Got: ' + hash + ' Expected: ' + expectedHex)
+				return null
+			}
 
 			// Парсим данные пользователя
 			const userStr = paramsMap['user']
