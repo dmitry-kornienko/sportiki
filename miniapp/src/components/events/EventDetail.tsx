@@ -62,35 +62,7 @@ export function EventDetail({
 		}).catch(() => {})
 	}
 
-	async function handleRegister() {
-		setLoading(true)
-		try {
-			const res = await register(event.id)
-			onRegister(event.id, res.status as 'MAIN' | 'RESERVE')
-			onToast(res.status === 'MAIN' ? 'Вы записаны!' : 'Вы в резерве')
-			refreshEvent()
-		} catch (e) {
-			onToast((e as Error).message)
-		} finally {
-			setLoading(false)
-		}
-	}
-
-	async function handleUnregister() {
-		setLoading(true)
-		try {
-			await unregister(event.id)
-			onUnregister(event.id)
-			onToast('Запись отменена')
-			refreshEvent()
-		} catch (e) {
-			onToast((e as Error).message)
-		} finally {
-			setLoading(false)
-		}
-	}
-
-	async function handleRegisterOnly() {
+async function handleRegisterOnly() {
 		setLoading(true)
 		setShowSheet(false)
 		try {
