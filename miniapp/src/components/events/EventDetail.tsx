@@ -345,20 +345,11 @@ async function handleRegisterOnly() {
 								<ol className={s.participantsList}>
 									{event.participants.map((p, i) => (
 										<li key={i} className={s.participantItem}>
-											{p.isGuest ? (
-												<span className={s.participantName}>
-													{p.name}
-													{p.username && (
-														<span className={s.participantGuest}> (гость от {p.username})</span>
-													)}
-												</span>
-											) : (
-												<>
-													<span className={s.participantName}>{p.name}</span>
-													{p.username && (
-														<span className={s.participantUsername}>{p.username}</span>
-													)}
-												</>
+											<span className={s.participantName}>{p.name}</span>
+											{p.username && (
+												p.isGuest
+													? <span className={s.participantGuest}>(гость от {p.username})</span>
+													: <span className={s.participantUsername}>{p.username}</span>
 											)}
 											{p.confirmed && <span className={s.confirmed}>✓</span>}
 										</li>
@@ -374,20 +365,11 @@ async function handleRegisterOnly() {
 								<ol className={s.participantsList}>
 									{event.reserveParticipants.map((p, i) => (
 										<li key={i} className={s.participantItem}>
-											{p.isGuest ? (
-												<span className={s.participantName}>
-													{p.name}
-													{p.username && (
-														<span className={s.participantGuest}> (гость от {p.username})</span>
-													)}
-												</span>
-											) : (
-												<>
-													<span className={s.participantName}>{p.name}</span>
-													{p.username && (
-														<span className={s.participantUsername}>{p.username}</span>
-													)}
-												</>
+											<span className={s.participantName}>{p.name}</span>
+											{p.username && (
+												p.isGuest
+													? <span className={s.participantGuest}>(гость от {p.username})</span>
+													: <span className={s.participantUsername}>{p.username}</span>
 											)}
 										</li>
 									))}
