@@ -369,7 +369,7 @@ async function handleRegisterOnly() {
 						{event.reserveParticipants && event.reserveParticipants.length > 0 && (
 							<>
 								<div className={s.reserveDivider}>
-									<span>Резерв</span>
+									<span>Резерв {event.reserveParticipants!.length}/{event.reserveLimit}</span>
 								</div>
 								<ol className={s.participantsList}>
 									{event.reserveParticipants.map((p, i) => (
