@@ -23,6 +23,13 @@ export interface CartItem {
 	price: number
 }
 
+export interface Participant {
+	name: string
+	username: string
+	isGuest: boolean
+	confirmed: boolean
+}
+
 export interface Event {
 	id: string
 	type: string
@@ -37,12 +44,14 @@ export interface Event {
 	totalCount: number
 	isFull: boolean
 	hasReserve: boolean
+	participants?: Participant[]
 }
 
 export interface Registration {
 	chatId: string
 	eventId: string
 	name: string
+	username: string
 	status: 'MAIN' | 'RESERVE'
 	isGuest: boolean
 	event?: {

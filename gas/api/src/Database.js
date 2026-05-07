@@ -175,6 +175,7 @@ const RegRepository = {
 			status: row[COL.REGS.STATUS] ? row[COL.REGS.STATUS].toString().trim() : '',
 			username: row[COL.REGS.USERNAME] ? row[COL.REGS.USERNAME].toString().trim() : '',
 			isGuest: row[COL.REGS.IS_GUEST] === 'YES',
+			confirmed: !!row[COL.REGS.CONFIRMATION] && row[COL.REGS.CONFIRMATION].toString().trim() !== '',
 		}
 	},
 
@@ -196,6 +197,49 @@ const RegRepository = {
 			.map(row => this._rowToReg(row))
 	},
 
+	findGuestByUserAndEvent(chatId, eventId) {
+		const data = SheetCache.data(SHEET_NAMES.REGS)
+		const cId = chatId.toString()
+		const eId = eventId.toString()
+		for (let i = 1; i < data.length; i++) {
+			const row = data[i]
+			if (
+				row[COL.REGS.CHAT_ID]?.toString().trim() === cId &&
+				row[COL.REGS.EVENT_ID]?.toString().trim() === eId &&
+				row[COL.REGS.IS_GUEST] === 'YES'
+			) {
+				return this._rowToReg(row)
+			}
+		}
+		return null
+	},
+
+	createGuest(chatId, eventId, guestName, status, username, tgName) {
+		const sheet = SheetCache.sheet(SHEET_NAMES.REGS)
+		sheet.appendRow([chatId, eventId, guestName, new Date(), status, username || '', tgName || '', 'YES', ''])
+		SheetCache.invalidate(SHEET_NAMES.REGS)
+	},
+
+	deleteGuestByUserAndEvent(chatId, eventId) {
+		const data = SheetCache.data(SHEET_NAMES.REGS)
+		const sheet = SheetCache.sheet(SHEET_NAMES.REGS)
+		const cId = chatId.toString()
+		const eId = eventId.toString()
+		for (let i = data.length - 1; i >= 1; i--) {
+			const row = data[i]
+			if (
+				row[COL.REGS.CHAT_ID]?.toString().trim() === cId &&
+				row[COL.REGS.EVENT_ID]?.toString().trim() === eId &&
+				row[COL.REGS.IS_GUEST] === 'YES'
+			) {
+				sheet.deleteRow(i + 1)
+				SheetCache.invalidate(SHEET_NAMES.REGS)
+				return true
+			}
+		}
+		return false
+	},
+
 	findByUserAndEvent(chatId, eventId) {
 		const data = SheetCache.data(SHEET_NAMES.REGS)
 		const cId = chatId.toString()
@@ -204,7 +248,8 @@ const RegRepository = {
 			const row = data[i]
 			if (
 				row[COL.REGS.CHAT_ID]?.toString().trim() === cId &&
-				row[COL.REGS.EVENT_ID]?.toString().trim() === eId
+				row[COL.REGS.EVENT_ID]?.toString().trim() === eId &&
+				row[COL.REGS.IS_GUEST] !== 'YES'
 			) {
 				return this._rowToReg(row)
 			}
@@ -227,7 +272,8 @@ const RegRepository = {
 			const row = data[i]
 			if (
 				row[COL.REGS.CHAT_ID]?.toString().trim() === cId &&
-				row[COL.REGS.EVENT_ID]?.toString().trim() === eId
+				row[COL.REGS.EVENT_ID]?.toString().trim() === eId &&
+				row[COL.REGS.IS_GUEST] !== 'YES'
 			) {
 				sheet.deleteRow(i + 1)
 				SheetCache.invalidate(SHEET_NAMES.REGS)
@@ -297,6 +343,15 @@ const db = {
 	},
 	findRegByUserAndEvent(chatId, eventId) {
 		return RegRepository.findByUserAndEvent(chatId, eventId)
+	},
+	findGuestByUserAndEvent(chatId, eventId) {
+		return RegRepository.findGuestByUserAndEvent(chatId, eventId)
+	},
+	createGuestReg(chatId, eventId, guestName, status, username, tgName) {
+		return RegRepository.createGuest(chatId, eventId, guestName, status, username, tgName)
+	},
+	deleteGuestReg(chatId, eventId) {
+		return RegRepository.deleteGuestByUserAndEvent(chatId, eventId)
 	},
 	createReg(chatId, eventId, name, status, username, tgName) {
 		return RegRepository.create(chatId, eventId, name, status, username, tgName)
