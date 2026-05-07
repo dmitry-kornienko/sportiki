@@ -43,9 +43,10 @@ const Keyboards = {
 		maxPeople,
 		chatId,
 		mainCount = 0,
+		reserveLimit = RESERVE_LIMIT,
 	) {
 		const buttons = []
-		const totalLimit = maxPeople > 0 ? maxPeople + RESERVE_LIMIT : Infinity
+		const totalLimit = maxPeople > 0 ? maxPeople + reserveLimit : Infinity
 		const hasSpace = maxPeople === 0 || occupiedTotal < totalLimit
 
 		const counterLabel =
@@ -67,6 +68,8 @@ const Keyboards = {
 			buttons.push([
 				{ text: Texts.buttons.register, callback_data: `reg_start_${eventId}` },
 			])
+		} else if (maxPeople > 0) {
+			buttons.push([{ text: 'Мест нет', callback_data: 'ignore' }])
 		}
 
 		if (userStatus.guestCount > 0) {

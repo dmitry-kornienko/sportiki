@@ -68,7 +68,7 @@ const RegistrationsController = {
 			let status
 			if (event.maxPeople === 0 || mainCount < event.maxPeople) {
 				status = REG_STATUS.MAIN
-			} else if (regs.length < event.maxPeople + LIMITS.RESERVE) {
+			} else if (regs.length < event.maxPeople + event.reserveLimit) {
 				status = REG_STATUS.RESERVE
 			} else {
 				return Response.error('Все места заняты, запись невозможна')
@@ -109,8 +109,8 @@ const RegistrationsController = {
 			db.clearCache()
 
 			const userReg = db.findRegByUserAndEvent(chatId, eventId)
-			if (!userReg || userReg.status !== REG_STATUS.MAIN) {
-				return Response.error('Добавить гостя можно только при записи в основной состав')
+			if (!userReg) {
+				return Response.error('Вы не записаны на это событие')
 			}
 
 			if (db.findGuestByUserAndEvent(chatId, eventId)) {
@@ -126,7 +126,7 @@ const RegistrationsController = {
 			let status
 			if (event.maxPeople === 0 || mainCount < event.maxPeople) {
 				status = REG_STATUS.MAIN
-			} else if (regs.length < event.maxPeople + LIMITS.RESERVE) {
+			} else if (regs.length < event.maxPeople + event.reserveLimit) {
 				status = REG_STATUS.RESERVE
 			} else {
 				return Response.error('Все места заняты, запись гостя невозможна')

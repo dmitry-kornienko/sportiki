@@ -35,7 +35,8 @@ const COLUMNS = Object.freeze({
     INFO:          7,
     STATUS:        8,
     LOCATION:      9,
-    REMINDER_SENT: 10
+    REMINDER_SENT: 10,
+    RESERVE_LIMIT: 11
   },
   REGS: {
     CHAT_ID:       1,
@@ -73,7 +74,8 @@ const COL = Object.freeze({
     INFO:          6,
     STATUS:        7,
     LOCATION:      8,
-    REMINDER_SENT: 9
+    REMINDER_SENT: 9,
+    RESERVE_LIMIT: 10
   },
   REGS: {
     CHAT_ID:       0,
@@ -214,7 +216,8 @@ const EventRepository = {
       info:         row[COL.EVENTS.INFO]          ? row[COL.EVENTS.INFO].toString()          : '',
       status:       row[COL.EVENTS.STATUS]        ? row[COL.EVENTS.STATUS].toString().trim() : '',
       location:     row[COL.EVENTS.LOCATION]      ? row[COL.EVENTS.LOCATION].toString()      : '',
-      reminderSent: row[COL.EVENTS.REMINDER_SENT] ? row[COL.EVENTS.REMINDER_SENT].toString() : ''
+      reminderSent: row[COL.EVENTS.REMINDER_SENT] ? row[COL.EVENTS.REMINDER_SENT].toString() : '',
+      reserveLimit: row[COL.EVENTS.RESERVE_LIMIT] ? parseInt(row[COL.EVENTS.RESERVE_LIMIT])  : RESERVE_LIMIT
     };
   },
 
@@ -347,7 +350,9 @@ const EventRepository = {
       eventData.maxPeople,
       eventData.info,
       STATUSES.OPEN,
-      eventData.location
+      eventData.location,
+      '',
+      eventData.reserveLimit || RESERVE_LIMIT
     ]);
     SheetCache.invalidate(SHEET_NAMES.EVENTS);
     return id;
@@ -453,7 +458,7 @@ const RegRepository = {
     const regs  = this.getByEvent(eventId);
     const count = regs.length;
     const max   = parseInt(event.maxPeople) || 0;
-    const total = max + RESERVE_LIMIT;
+    const total = max + event.reserveLimit;
 
     let status;
     if (max === 0) {
@@ -579,7 +584,7 @@ const RegRepository = {
     const event = EventRepository.findById(eventId);
     if (!event || !event.maxPeople || parseInt(event.maxPeople) === 0) return;
 
-    const totalLimit   = parseInt(event.maxPeople) + RESERVE_LIMIT;
+    const totalLimit   = parseInt(event.maxPeople) + event.reserveLimit;
     const currentCount = this.getByEvent(eventId).length;
 
     if (currentCount < totalLimit && event.status === STATUSES.CLOSED) {

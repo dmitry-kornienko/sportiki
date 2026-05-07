@@ -55,7 +55,7 @@ export function EventsScreen({ onToast }: Props) {
 				<EventCard
 					key={event.id}
 					event={event}
-					regStatus={isRegistered(event.id) ? getRegStatus(event.id) : null}
+					regStatus={isRegistered(event.id) ? (getRegStatus(event.id) ?? getGuestReg(event.id)?.status ?? null) : null}
 					onClick={() => setSelectedEvent(event)}
 				/>
 			))}

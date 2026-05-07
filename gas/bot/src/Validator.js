@@ -126,6 +126,19 @@ const Validator = {
 	},
 
 	/**
+	 * Проверяет лимит резерва — целое число >= 0.
+	 * @param {string} text
+	 * @returns {{ valid: boolean, error?: string }}
+	 */
+	reserveLimit(text) {
+		const val = parseInt(text)
+		if (isNaN(val) || val < 0 || text.trim() !== String(val)) {
+			return { valid: false, error: Texts.admin.errorReserve }
+		}
+		return { valid: true }
+	},
+
+	/**
 	 * Проверяет новый лимит мест при редактировании существующего события.
 	 * Дополнительно проверяет что новый лимит не меньше числа уже записавшихся.
 	 * @param {string} text

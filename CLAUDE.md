@@ -349,14 +349,12 @@ npm run miniapp:dev          # локальный дев сервер
 npm run miniapp:build        # сборка для прода
 
 # GAS Bot
-npm run bot:push:dev         # пуш в тестовый GAS
-npm run bot:push:prod        # пуш в продакшен GAS
-npm run bot:deploy           # пуш + деплой новой версии
+npm run bot:deploy:dev       # пуш + деплой в тестовый GAS
+npm run bot:deploy:prod      # пуш + деплой в продакшен GAS
 
 # GAS API
-npm run api:push:dev         # пуш в тестовый GAS
-npm run api:push:prod        # пуш в продакшен GAS
-npm run api:deploy           # пуш + деплой новой версии
+npm run api:deploy:dev       # пуш + деплой в тестовый GAS
+npm run api:deploy:prod      # пуш + деплой в продакшен GAS
 ```
 
 ---

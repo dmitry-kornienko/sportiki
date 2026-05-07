@@ -662,6 +662,7 @@ const Sender = {
 			parseInt(event.maxPeople),
 			chatId,
 			mainCount,
+			event.reserveLimit,
 		)
 
 		if (messageId) {

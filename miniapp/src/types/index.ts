@@ -37,6 +37,7 @@ export interface Event {
 	date: string
 	time: string
 	maxPeople: number
+	reserveLimit: number
 	info: string
 	status: string
 	location: string
@@ -45,6 +46,7 @@ export interface Event {
 	isFull: boolean
 	hasReserve: boolean
 	participants?: Participant[]
+	reserveParticipants?: Participant[]
 }
 
 export interface Registration {

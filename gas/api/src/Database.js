@@ -17,6 +17,7 @@ const COL = Object.freeze({
 		STATUS: 7,
 		LOCATION: 8,
 		REMINDER_SENT: 9,
+		RESERVE_LIMIT: 10,
 	},
 	REGS: {
 		CHAT_ID: 0,
@@ -124,6 +125,9 @@ const EventRepository = {
 			location: row[COL.EVENTS.LOCATION]
 				? row[COL.EVENTS.LOCATION].toString()
 				: '',
+			reserveLimit: row[COL.EVENTS.RESERVE_LIMIT]
+				? parseInt(row[COL.EVENTS.RESERVE_LIMIT])
+				: DEFAULT_RESERVE_LIMIT,
 		}
 	},
 
@@ -152,6 +156,29 @@ const EventRepository = {
 			}
 		}
 		return null
+	},
+
+	create(eventData) {
+		const sheet = SheetCache.sheet(SHEET_NAMES.EVENTS)
+		const id = Date.now().toString().slice(-6)
+		const reserveLimit = parseInt(eventData.maxPeople) > 0
+			? (parseInt(eventData.reserveLimit) || DEFAULT_RESERVE_LIMIT)
+			: 0
+		sheet.appendRow([
+			id,
+			eventData.type,
+			eventData.title,
+			eventData.date,
+			eventData.time,
+			parseInt(eventData.maxPeople) || 0,
+			eventData.info,
+			EVENT_STATUS.OPEN,
+			eventData.location || '',
+			'',
+			reserveLimit,
+		])
+		SheetCache.invalidate(SHEET_NAMES.EVENTS)
+		return id
 	},
 
 	_parseDate(dateStr) {
@@ -334,6 +361,9 @@ const db = {
 	},
 	getEventById(id) {
 		return EventRepository.findById(id)
+	},
+	createEvent(eventData) {
+		return EventRepository.create(eventData)
 	},
 	getRegsByEvent(eventId) {
 		return RegRepository.getByEvent(eventId)

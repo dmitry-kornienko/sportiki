@@ -27,11 +27,35 @@ const REG_STATUS = Object.freeze({
 	RESERVE: 'RESERVE',
 })
 
+// Лимит резерва по умолчанию — используется если в строке Events не задан ReserveLimit
+const DEFAULT_RESERVE_LIMIT = 20
+
 // Лимиты
 const LIMITS = Object.freeze({
-	RESERVE: 20,
 	PER_USER: 2,
 })
+
+/**
+ * Возвращает список ID администраторов из Script Properties.
+ * Ключи: OWNER_ID и ADMIN_IDS (через запятую) — те же что у бота.
+ * @returns {string[]}
+ */
+function getAdminIds() {
+	const props = PropertiesService.getScriptProperties().getProperties()
+	const owner = props['OWNER_ID'] || ''
+	const extra = (props['ADMIN_IDS'] || '').split(',').map(s => s.trim()).filter(Boolean)
+	return [...new Set([owner, ...extra])].filter(Boolean)
+}
+
+/**
+ * Проверяет, является ли пользователь администратором.
+ * @param {string|number} userId
+ * @returns {boolean}
+ */
+function isAdmin(userId) {
+	if (!userId) return false
+	return getAdminIds().includes(userId.toString())
+}
 
 /**
  * Возвращает токен бота из Script Properties.

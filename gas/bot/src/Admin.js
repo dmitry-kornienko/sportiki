@@ -42,6 +42,13 @@ const WIZARD_STEPS = [
 		fieldName: 'maxPeople',
 	},
 	{
+		state: STATUSES.SET_RESERVE,
+		prompt: () => Texts.admin.askReserve,
+		validate: text => Validator.reserveLimit(text),
+		fieldName: 'reserveLimit',
+		skip: accumulated => parseInt(accumulated.maxPeople) === 0,
+	},
+	{
 		state: STATUSES.SET_INFO,
 		prompt: () => Texts.admin.askInfo,
 		validate: text => Validator.nonEmpty(text, 1000),
@@ -60,11 +67,14 @@ const AdminWizard = {
 		return WIZARD_STEPS.find(s => s.state === state) || null
 	},
 
-	_getNextStep(currentState) {
+	_getNextStep(currentState, accumulated = {}) {
 		const idx = WIZARD_STEPS.findIndex(s => s.state === currentState)
-		return idx !== -1 && idx < WIZARD_STEPS.length - 1
-			? WIZARD_STEPS[idx + 1]
-			: null
+		if (idx === -1) return null
+		for (let i = idx + 1; i < WIZARD_STEPS.length; i++) {
+			const step = WIZARD_STEPS[i]
+			if (!step.skip || !step.skip(accumulated)) return step
+		}
+		return null
 	},
 
 	_cancelKeyboard() {
@@ -99,7 +109,7 @@ const AdminWizard = {
 		const accumulated = safeParseJson(userStatus.tempData) || {}
 		accumulated[step.fieldName] = text.trim()
 
-		const nextStep = this._getNextStep(userStatus.state)
+		const nextStep = this._getNextStep(userStatus.state, accumulated)
 
 		if (nextStep) {
 			db.setState(chatId, nextStep.state, JSON.stringify(accumulated))
@@ -111,6 +121,7 @@ const AdminWizard = {
 
 	_finish(chatId, eventData) {
 		try {
+			if (parseInt(eventData.maxPeople) === 0) eventData.reserveLimit = 0
 			db.createEvent(eventData)
 			db.resetState(chatId)
 			sendMsg(chatId, Texts.admin.createSuccess)

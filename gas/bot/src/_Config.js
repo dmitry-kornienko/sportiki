@@ -49,7 +49,7 @@ const CHANNEL_URL = 'https://t.me/INaumkin_coach'
 const MINI_APP_URL =
 	_PROPS['MINI_APP_URL'] || 'https://dmitry-kornienko.github.io/sportiki'
 
-/** Максимальное количество мест в резерве */
+/** Количество мест в резерве по умолчанию (используется если в Events не задано) */
 const RESERVE_LIMIT = 20
 
 /** Максимум регистраций на одного пользователя (сам + гость) */
@@ -88,6 +88,7 @@ const STATUSES = Object.freeze({
 	SET_DATE: 'ADMIN_SET_DATE',
 	SET_TIME: 'ADMIN_SET_TIME',
 	SET_MAX: 'ADMIN_SET_MAX',
+	SET_RESERVE: 'ADMIN_SET_RESERVE',
 	SET_INFO: 'ADMIN_SET_INFO',
 	SET_LOC: 'ADMIN_SET_LOC',
 

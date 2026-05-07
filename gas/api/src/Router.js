@@ -77,6 +77,8 @@ function doPost(e) {
 				return RegistrationsController.registerGuest(body, currentUser)
 			case 'unregister_guest':
 				return RegistrationsController.removeGuest(body, currentUser)
+			case 'create_event':
+				return EventsController.create(body, currentUser)
 
 			default:
 				return Response.error(`Неизвестный action: ${action}`, 404)

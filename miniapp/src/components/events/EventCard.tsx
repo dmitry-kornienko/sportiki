@@ -34,6 +34,11 @@ export function EventCard({ event, regStatus, onClick }: Props) {
 						? `${event.mainCount}/${event.maxPeople}`
 						: event.mainCount}
 				</div>
+				{!regStatus && event.isFull && event.reserveLimit > 0 && (
+					<div className={event.hasReserve ? s.reserveCount : s.reserveCountFull}>
+						Резерв {event.totalCount - event.mainCount}/{event.reserveLimit}
+					</div>
+				)}
 				<div className={s.badgeArea}>
 					{regStatus === 'MAIN' && <div className={s.badge}>✓ Записан</div>}
 					{regStatus === 'RESERVE' && (

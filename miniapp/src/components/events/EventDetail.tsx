@@ -42,6 +42,12 @@ export function EventDetail({
 	const [guestModalName, setGuestModalName] = useState('')
 	const [guestLoading, setGuestLoading] = useState(false)
 
+	const spotsLeft = event.maxPeople === 0
+		? Infinity
+		: (event.maxPeople + event.reserveLimit) - event.totalCount
+	const canRegisterWithGuest = spotsLeft >= 2  // нужно 2 свободных (себя + гость)
+	const canAddGuest = event.maxPeople === 0 || spotsLeft >= 1  // уже записан, нужно 1 место для гостя
+
 	useEffect(() => {
 		fetchEvent(initialEvent.id)
 			.then(setEvent)
@@ -106,23 +112,19 @@ export function EventDetail({
 		try {
 			const res = await register(event.id)
 			onRegister(event.id, res.status as 'MAIN' | 'RESERVE')
-			if (res.status === 'MAIN') {
-				try {
-					const guestRes = await registerGuest(event.id, sheetGuestName.trim())
-					onGuestRegister({
-						chatId: '',
-						eventId: event.id,
-						name: guestRes.guestName,
-						username: '',
-						status: guestRes.status as 'MAIN' | 'RESERVE',
-						isGuest: true,
-					})
-					onToast('Вы записаны вместе с гостем!')
-				} catch {
-					onToast('Вы записаны. Гостя не удалось добавить')
-				}
-			} else {
-				onToast('Вы в резерве')
+			try {
+				const guestRes = await registerGuest(event.id, sheetGuestName.trim())
+				onGuestRegister({
+					chatId: '',
+					eventId: event.id,
+					name: guestRes.guestName,
+					username: '',
+					status: guestRes.status as 'MAIN' | 'RESERVE',
+					isGuest: true,
+				})
+				onToast(res.status === 'MAIN' ? 'Вы записаны вместе с гостем!' : 'Вы в резерве вместе с гостем!')
+			} catch {
+				onToast(res.status === 'MAIN' ? 'Вы записаны. Гостя не удалось добавить' : 'Вы в резерве. Гостя не удалось добавить')
 			}
 			refreshEvent()
 		} catch (e) {
@@ -216,6 +218,7 @@ export function EventDetail({
 				</button>
 			)
 		}
+
 		if (regStatus === 'MAIN') {
 			return (
 				<div className={s.actionCol}>
@@ -236,48 +239,63 @@ export function EventDetail({
 				</div>
 			)
 		}
-		let primaryBtn
+
 		if (regStatus === 'RESERVE') {
-			primaryBtn = (
-				<button className={`${s.btn} ${s.btnReserved}`} onClick={handleUnregister}>
-					⏳ В резерве — отменить
-				</button>
+			return (
+				<div className={s.actionCol}>
+					<button
+						className={`${s.btn} ${s.btnReserved}`}
+						onClick={() => setShowUnregisterSheet(true)}
+						disabled={guestLoading}
+					>
+						⏳ В резерве — отменить
+					</button>
+					{guestLoading ? (
+						<button className={s.addGuestBtn} disabled><Loader /></button>
+					) : !guestReg && canAddGuest ? (
+						<button className={s.addGuestBtn} onClick={() => setShowGuestModal(true)}>
+							+ Гость
+						</button>
+					) : null}
+				</div>
 			)
-		} else if (event.isFull && !event.hasReserve) {
-			primaryBtn = (
+		}
+
+		if (event.isFull && !event.hasReserve) {
+			const primaryBtn = (
 				<button className={`${s.btn} ${s.btnFull}`} disabled>
 					Мест нет
 				</button>
 			)
-		} else if (event.isFull && event.hasReserve) {
-			primaryBtn = (
-				<button className={`${s.btn} ${s.btnReserve}`} onClick={handleRegister}>
-					Записаться в резерв
-				</button>
-			)
-		} else {
-			primaryBtn = (
-				<button className={`${s.btn} ${s.btnRegister}`} onClick={() => setShowSheet(true)}>
-					Записаться
-				</button>
-			)
+			if (guestReg) {
+				return (
+					<div className={s.actionCol}>
+						{primaryBtn}
+						<button className={s.removeGuestBtn} onClick={handleUnregisterGuest} disabled={guestLoading}>
+							{guestLoading ? <Loader /> : 'Удалить гостя'}
+						</button>
+					</div>
+				)
+			}
+			return primaryBtn
 		}
 
+		const label = event.isFull && event.hasReserve ? 'Записаться в резерв' : 'Записаться'
+		const primaryBtn = (
+			<button className={`${s.btn} ${s.btnRegister}`} onClick={() => setShowSheet(true)}>
+				{label}
+			</button>
+		)
 		if (guestReg) {
 			return (
 				<div className={s.actionCol}>
 					{primaryBtn}
-					<button
-						className={s.removeGuestBtn}
-						onClick={handleUnregisterGuest}
-						disabled={guestLoading}
-					>
+					<button className={s.removeGuestBtn} onClick={handleUnregisterGuest} disabled={guestLoading}>
 						{guestLoading ? <Loader /> : 'Удалить гостя'}
 					</button>
 				</div>
 			)
 		}
-
 		return primaryBtn
 	}
 
@@ -347,31 +365,63 @@ export function EventDetail({
 					<div className={s.participantsLoading}>
 						<Loader />
 					</div>
-				) : event.participants && event.participants.length > 0 ? (
+				) : (event.participants && event.participants.length > 0) || (event.reserveParticipants && event.reserveParticipants.length > 0) ? (
 					<div className={s.participants}>
-						<div className={s.participantsTitle}>Участники</div>
-						<ol className={s.participantsList}>
-							{event.participants.map((p, i) => (
-								<li key={i} className={s.participantItem}>
-									{p.isGuest ? (
-										<span className={s.participantName}>
-											{p.name}
-											{p.username && (
-												<span className={s.participantGuest}> (гость от {p.username})</span>
+						{event.participants && event.participants.length > 0 && (
+							<>
+								<div className={s.participantsTitle}>Участники</div>
+								<ol className={s.participantsList}>
+									{event.participants.map((p, i) => (
+										<li key={i} className={s.participantItem}>
+											{p.isGuest ? (
+												<span className={s.participantName}>
+													{p.name}
+													{p.username && (
+														<span className={s.participantGuest}> (гость от {p.username})</span>
+													)}
+												</span>
+											) : (
+												<>
+													<span className={s.participantName}>{p.name}</span>
+													{p.username && (
+														<span className={s.participantUsername}>{p.username}</span>
+													)}
+												</>
 											)}
-										</span>
-									) : (
-										<>
-											<span className={s.participantName}>{p.name}</span>
-											{p.username && (
-												<span className={s.participantUsername}>{p.username}</span>
+											{p.confirmed && <span className={s.confirmed}>✓</span>}
+										</li>
+									))}
+								</ol>
+							</>
+						)}
+						{event.reserveParticipants && event.reserveParticipants.length > 0 && (
+							<>
+								<div className={s.reserveDivider}>
+									<span>Резерв</span>
+								</div>
+								<ol className={s.participantsList}>
+									{event.reserveParticipants.map((p, i) => (
+										<li key={i} className={s.participantItem}>
+											{p.isGuest ? (
+												<span className={s.participantName}>
+													{p.name}
+													{p.username && (
+														<span className={s.participantGuest}> (гость от {p.username})</span>
+													)}
+												</span>
+											) : (
+												<>
+													<span className={s.participantName}>{p.name}</span>
+													{p.username && (
+														<span className={s.participantUsername}>{p.username}</span>
+													)}
+												</>
 											)}
-										</>
-									)}
-									{p.confirmed && <span className={s.confirmed}>✓</span>}
-								</li>
-							))}
-						</ol>
+										</li>
+									))}
+								</ol>
+							</>
+						)}
 					</div>
 				) : null}
 			</div>
@@ -438,7 +488,7 @@ export function EventDetail({
 						<span>Да, только я</span>
 					</button>
 
-					{!guestReg && (
+					{!guestReg && canRegisterWithGuest && (
 						<div
 							className={`${s.sheetCard} ${showGuestCard ? s.sheetCardOpen : ''}`}
 							onClick={() => { if (!showGuestCard) setShowGuestCard(true) }}
