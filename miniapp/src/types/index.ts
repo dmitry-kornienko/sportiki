@@ -38,6 +38,8 @@ export interface Event {
 	time: string
 	maxPeople: number
 	reserveLimit: number
+	price: number
+	paymentInfo: string
 	info: string
 	status: string
 	location: string

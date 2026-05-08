@@ -5,10 +5,12 @@ export function getTelegramUser() {
 }
 
 export function getTelegramUserId(): string {
+	if (import.meta.env.VITE_DEV_USER_ID) return import.meta.env.VITE_DEV_USER_ID as string
 	return String(getTelegramUser()?.id ?? '')
 }
 
 export function isAdmin(): boolean {
+	if (import.meta.env.VITE_DEV_ADMIN === 'true') return true
 	return ADMIN_IDS.includes(getTelegramUserId())
 }
 

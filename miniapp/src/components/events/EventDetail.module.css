@@ -86,6 +86,157 @@
 	color: var(--text);
 }
 
+.paymentBlock {
+	background: #fffbeb;
+	border: 1.5px solid #fde68a;
+	border-radius: 12px;
+	padding: 12px 14px;
+}
+
+.paymentHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.paymentTitle {
+	font-family: 'Barlow Condensed', sans-serif;
+	font-weight: 700;
+	font-size: 15px;
+	color: #92400e;
+}
+
+.payBtn {
+	font-family: 'Barlow Condensed', sans-serif;
+	font-weight: 800;
+	font-size: 13px;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	background: #92400e;
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	padding: 5px 12px;
+	cursor: pointer;
+	flex-shrink: 0;
+	transition: opacity 0.15s;
+}
+
+.payBtn:active {
+	opacity: 0.8;
+}
+
+.payMethodsList {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.payMethodItem {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.payMethodItemCopyable {
+	cursor: pointer;
+	border-radius: 8px;
+	margin: 0 -6px;
+	padding: 4px 6px;
+	transition: background 0.15s;
+}
+
+.payMethodItemCopyable:active {
+	background: #fde68a;
+}
+
+.payMethodCopy {
+	margin-left: auto;
+	font-size: 14px;
+	color: #b45309;
+	opacity: 0.6;
+	flex-shrink: 0;
+}
+
+.payMethodIcon {
+	font-size: 15px;
+	line-height: 1.4;
+	flex-shrink: 0;
+}
+
+.payMethodDetails {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+}
+
+.payMethodLabel {
+	font-size: 12px;
+	font-weight: 600;
+	color: #92400e;
+}
+
+.payMethodValue {
+	font-size: 13px;
+	color: #78350f;
+}
+
+.payMethodText {
+	font-size: 13px;
+	color: #78350f;
+	white-space: pre-wrap;
+	line-height: 1.5;
+}
+
+.paySheetEvent {
+	font-size: 13px;
+	color: var(--gray);
+	margin-bottom: 16px;
+}
+
+.payUploadArea {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	border: 2px dashed var(--border);
+	border-radius: 14px;
+	padding: 28px 16px;
+	cursor: pointer;
+	transition: border-color 0.15s;
+	margin-bottom: 16px;
+}
+
+.payUploadArea:active {
+	border-color: var(--accent);
+}
+
+.payFileInput {
+	display: none;
+}
+
+.payUploadIcon {
+	font-size: 36px;
+	line-height: 1;
+}
+
+.payUploadText {
+	font-size: 14px;
+	color: var(--gray);
+	text-align: center;
+}
+
+.payFileName {
+	font-size: 14px;
+	color: var(--accent);
+	font-weight: 600;
+	text-align: center;
+	word-break: break-all;
+}
+
 .desc {
 	font-size: 14px;
 	color: var(--gray);

@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useEvents } from '../hooks/useEvents'
 import { EventCard } from '../components/events/EventCard'
 import { EventDetail } from '../components/events/EventDetail'
+import { CreateEventSheet } from '../components/events/CreateEventSheet'
 import { Loader } from '../components/ui/Loader'
 import type { Event, Registration } from '../types'
-import { getTelegramUserId } from '../utils/telegram'
+import { getTelegramUserId, isAdmin } from '../utils/telegram'
 import s from './EventsScreen.module.css'
 
 interface Props {
@@ -12,8 +13,9 @@ interface Props {
 }
 
 export function EventsScreen({ onToast }: Props) {
-	const { events, loading, error, isRegistered, getRegStatus, getGuestReg, addRegistration, removeRegistration, removeGuestRegistration, updateEvent } = useEvents()
+	const { events, loading, error, isRegistered, getRegStatus, getGuestReg, addEvent, addRegistration, removeRegistration, removeGuestRegistration, updateEvent } = useEvents()
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+	const [showCreate, setShowCreate] = useState(false)
 
 	if (loading) return <Loader fullscreen />
 	if (error) return <div className={s.error}>Ошибка: {error}</div>
@@ -48,17 +50,30 @@ export function EventsScreen({ onToast }: Props) {
 	}
 
 	return (
-		<div className={s.screen}>
-			<div className={s.title}>События</div>
-			<div className={s.sub}>Активности экспат-комьюнити Da Nang</div>
-			{events.map(event => (
-				<EventCard
-					key={event.id}
-					event={event}
-					regStatus={isRegistered(event.id) ? (getRegStatus(event.id) ?? getGuestReg(event.id)?.status ?? null) : null}
-					onClick={() => setSelectedEvent(event)}
-				/>
-			))}
-		</div>
+		<>
+			<div className={s.screen}>
+				<div className={s.titleRow}>
+					<div className={s.title}>События</div>
+					{isAdmin() && (
+						<button className={s.addBtn} onClick={() => setShowCreate(true)}>+ Создать</button>
+					)}
+				</div>
+				<div className={s.sub}>Активности экспат-комьюнити Da Nang</div>
+				{events.map(event => (
+					<EventCard
+						key={event.id}
+						event={event}
+						regStatus={isRegistered(event.id) ? (getRegStatus(event.id) ?? getGuestReg(event.id)?.status ?? null) : null}
+						onClick={() => setSelectedEvent(event)}
+					/>
+				))}
+			</div>
+			<CreateEventSheet
+				open={showCreate}
+				onCreated={addEvent}
+				onClose={() => setShowCreate(false)}
+				onToast={onToast}
+			/>
+		</>
 	)
 }

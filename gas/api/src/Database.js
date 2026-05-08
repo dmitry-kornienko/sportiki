@@ -18,6 +18,8 @@ const COL = Object.freeze({
 		LOCATION: 8,
 		REMINDER_SENT: 9,
 		RESERVE_LIMIT: 10,
+		PRICE: 11,
+		PAYMENT_INFO: 12,
 	},
 	REGS: {
 		CHAT_ID: 0,
@@ -128,6 +130,8 @@ const EventRepository = {
 			reserveLimit: row[COL.EVENTS.RESERVE_LIMIT]
 				? parseInt(row[COL.EVENTS.RESERVE_LIMIT])
 				: DEFAULT_RESERVE_LIMIT,
+			price: row[COL.EVENTS.PRICE] ? Number(row[COL.EVENTS.PRICE]) : 0,
+			paymentInfo: row[COL.EVENTS.PAYMENT_INFO] ? row[COL.EVENTS.PAYMENT_INFO].toString() : '',
 		}
 	},
 
@@ -176,6 +180,8 @@ const EventRepository = {
 			eventData.location || '',
 			'',
 			reserveLimit,
+			parseInt(eventData.price) || 0,
+			eventData.paymentInfo || '',
 		])
 		SheetCache.invalidate(SHEET_NAMES.EVENTS)
 		return id

@@ -85,7 +85,7 @@ const EventsController = {
 	create(body, user) {
 		if (!isAdmin(user.id)) return Response.error('Доступ запрещён', 403)
 
-		const { type, title, date, time, maxPeople, reserveLimit, info, location } = body
+		const { type, title, date, time, maxPeople, reserveLimit, info, location, price, paymentInfo } = body
 
 		if (!type?.trim())     return Response.error('Не указан type')
 		if (!title?.trim())    return Response.error('Не указан title')
@@ -116,6 +116,8 @@ const EventsController = {
 			reserveLimit: reserveLimitNum,
 			info: info.trim(),
 			location: location.trim(),
+			price: price || 0,
+			paymentInfo: paymentInfo?.trim() || '',
 		})
 
 		return Response.ok({ id })

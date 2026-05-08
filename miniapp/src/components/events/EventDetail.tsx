@@ -4,7 +4,24 @@ import { fetchEvent } from '../../api/events'
 import { register, unregister, registerGuest, unregisterGuest } from '../../api/registrations'
 import type { Event, Registration } from '../../types'
 import { Loader } from '../ui/Loader'
+import { fmt } from '../../utils/format'
 import s from './EventDetail.module.css'
+
+const PAY_LABELS: Record<string, { icon: string; label: string }> = {
+	vn:    { icon: '🏦', label: 'Вьетнамский счёт' },
+	sbp:   { icon: '📱', label: 'СБП' },
+	bybit: { icon: '⚡', label: 'Bybit' },
+	cash:  { icon: '💵', label: 'Наличные' },
+}
+
+function parsePaymentInfo(raw: string): Record<string, string | boolean> | null {
+	if (!raw) return null
+	try {
+		return JSON.parse(raw)
+	} catch {
+		return { _text: raw }
+	}
+}
 
 interface Props {
 	event: Event
@@ -41,6 +58,8 @@ export function EventDetail({
 	const [showGuestModal, setShowGuestModal] = useState(false)
 	const [guestModalName, setGuestModalName] = useState('')
 	const [guestLoading, setGuestLoading] = useState(false)
+	const [showPaySheet, setShowPaySheet] = useState(false)
+	const [payFile, setPayFile] = useState<File | null>(null)
 
 	const spotsLeft = event.maxPeople === 0
 		? Infinity
@@ -319,7 +338,56 @@ async function handleRegisterOnly() {
 				</div>
 
 
-{event.info && <div className={s.desc}>{event.info}</div>}
+{event.price > 0 && (() => {
+					const methods = parsePaymentInfo(event.paymentInfo)
+					return (
+						<div className={s.paymentBlock}>
+							<div className={s.paymentHeader}>
+								<div className={s.paymentTitle}>💳 Платное — {fmt(event.price)}</div>
+								<button className={s.payBtn} onClick={() => setShowPaySheet(true)}>
+									Оплатить
+								</button>
+							</div>
+							{methods && (
+								<div className={s.payMethodsList}>
+									{Object.entries(methods).map(([key, val]) => {
+										if (key === '_text') return (
+											<div key={key} className={s.payMethodItem}>
+												<span className={s.payMethodText}>{val as string}</span>
+											</div>
+										)
+										const cfg = PAY_LABELS[key]
+										if (!cfg) return null
+										const copyable = typeof val === 'string' && val
+										return (
+											<div
+												key={key}
+												className={`${s.payMethodItem} ${copyable ? s.payMethodItemCopyable : ''}`}
+												onClick={() => {
+													if (!copyable) return
+													navigator.clipboard.writeText(val as string)
+														.then(() => onToast('Реквизиты скопированы'))
+														.catch(() => onToast('Не удалось скопировать'))
+												}}
+											>
+												<span className={s.payMethodIcon}>{cfg.icon}</span>
+												<span className={s.payMethodDetails}>
+													<span className={s.payMethodLabel}>{cfg.label}</span>
+													{copyable && (
+														<span className={s.payMethodValue}>{val as string}</span>
+													)}
+												</span>
+												{copyable && <span className={s.payMethodCopy}>⎘</span>}
+											</div>
+										)
+									})}
+								</div>
+							)}
+						</div>
+					)
+				})()}
+
+				{event.info && <div className={s.desc}>{event.info}</div>}
 
 				<div className={s.countRow}>
 					<span className={countClass}>
@@ -471,6 +539,35 @@ async function handleRegisterOnly() {
 							)}
 						</div>
 					)}
+				</div>
+			</>,
+			document.body
+		)}
+		{showPaySheet && createPortal(
+			<>
+				<div className={s.sheetBackdrop} onClick={() => { setShowPaySheet(false); setPayFile(null) }} />
+				<div className={s.sheet}>
+					<div className={s.sheetTitle}>Подтверждение оплаты</div>
+					<div className={s.paySheetEvent}>{event.title} — {fmt(event.price)}</div>
+					<label className={s.payUploadArea}>
+						<input
+							type="file"
+							accept="image/*"
+							className={s.payFileInput}
+							onChange={e => setPayFile(e.target.files?.[0] ?? null)}
+						/>
+						{payFile ? (
+							<div className={s.payFileName}>📎 {payFile.name}</div>
+						) : (
+							<>
+								<div className={s.payUploadIcon}>📷</div>
+								<div className={s.payUploadText}>Загрузить скриншот перевода</div>
+							</>
+						)}
+					</label>
+					<button className={s.sheetFullBtn} disabled={!payFile}>
+						Отправить
+					</button>
 				</div>
 			</>,
 			document.body

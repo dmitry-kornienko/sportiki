@@ -31,6 +31,10 @@ export function useEvents() {
 		return registrations.find(r => r.eventId === eventId && r.isGuest) ?? null
 	}
 
+	function addEvent(event: Event) {
+		setEvents(prev => [...prev, event])
+	}
+
 	function updateEvent(updated: Event) {
 		setEvents(prev => prev.map(e => (e.id === updated.id ? updated : e)))
 	}
@@ -63,6 +67,7 @@ export function useEvents() {
 		isRegistered,
 		getRegStatus,
 		getGuestReg,
+		addEvent,
 		updateEvent,
 		addRegistration,
 		removeRegistration,

@@ -20,7 +20,10 @@ export function EventCard({ event, regStatus, onClick }: Props) {
 			onClick={onClick}
 		>
 			<div className={s.info}>
-				<div className={s.title}>{event.title}</div>
+				<div className={s.titleRow}>
+					<div className={s.title}>{event.title}</div>
+					{event.price > 0 && <span className={s.paidBadge}>$</span>}
+				</div>
 				<div className={s.meta}>
 					<span>{event.date}</span>
 					<span>{event.time}</span>
