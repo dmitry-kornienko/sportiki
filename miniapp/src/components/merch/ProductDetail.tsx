@@ -14,13 +14,11 @@ interface Props {
 export function ProductDetail({ product, isInCart, onAdd, onClose }: Props) {
 	const toast = useToastAction()
 	const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
-	const [imgSrc, setImgSrc] = useState('')
 	const [imgError, setImgError] = useState(false)
 
 	useEffect(() => {
 		if (product) {
 			setSelectedIdx(null)
-			setImgSrc(product.colors[0].img)
 			setImgError(false)
 		}
 	}, [product])
@@ -28,11 +26,11 @@ export function ProductDetail({ product, isInCart, onAdd, onClose }: Props) {
 	if (!product) return null
 
 	const selectedColor = selectedIdx !== null ? product.colors[selectedIdx] : null
+	const imgSrc = selectedColor ? selectedColor.img : product.colors[0].img
 	const inCart = selectedColor ? isInCart(product.id, selectedColor.name) : false
 
 	function handleSelectColor(idx: number) {
 		setSelectedIdx(idx)
-		setImgSrc(product!.colors[idx].img)
 		setImgError(false)
 	}
 
