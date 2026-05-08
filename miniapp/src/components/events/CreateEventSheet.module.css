@@ -58,7 +58,7 @@
 }
 
 .body {
-	padding: 20px 16px 40px;
+	padding: 20px 16px calc(var(--nav-h) + 24px);
 	display: flex;
 	flex-direction: column;
 	gap: 16px;

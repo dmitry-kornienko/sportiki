@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createEvent } from '../../api/events'
 import type { Event } from '../../types'
 import { fmt } from '../../utils/format'
@@ -79,6 +79,12 @@ export function CreateEventSheet({ open, onCreated, onClose, onToast }: Props) {
 	const [form, setForm] = useState(EMPTY_FORM)
 	const [pay, setPay] = useState<PayMethods>(EMPTY_PAY)
 	const [loading, setLoading] = useState(false)
+	const [visible, setVisible] = useState(false)
+
+	useEffect(() => {
+		if (open) requestAnimationFrame(() => setVisible(true))
+		else setVisible(false)
+	}, [open])
 
 	function setField(field: keyof typeof EMPTY_FORM, value: string) {
 		setForm(prev => ({ ...prev, [field]: value }))
@@ -169,7 +175,7 @@ export function CreateEventSheet({ open, onCreated, onClose, onToast }: Props) {
 	const price = parseInt(form.price) || 0
 
 	return (
-		<div className={`${s.overlay} ${open ? s.active : ''}`}>
+		<div className={`${s.overlay} ${visible ? s.active : ''}`}>
 			<div className={s.header}>
 				<button className={s.backBtn} onClick={handleClose} type='button'>
 					←

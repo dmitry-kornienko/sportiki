@@ -68,12 +68,14 @@ export function EventsScreen({ onToast }: Props) {
 					/>
 				))}
 			</div>
-			<CreateEventSheet
-				open={showCreate}
-				onCreated={addEvent}
-				onClose={() => setShowCreate(false)}
-				onToast={onToast}
-			/>
+			{showCreate && (
+				<CreateEventSheet
+					open={showCreate}
+					onCreated={addEvent}
+					onClose={() => setShowCreate(false)}
+					onToast={onToast}
+				/>
+			)}
 		</>
 	)
 }
