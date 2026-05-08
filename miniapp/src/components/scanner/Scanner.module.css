@@ -55,11 +55,11 @@
 }
 
 .resultOk {
-	background: #d1fae5;
-	color: #065f46;
+	background: var(--success-bg);
+	color: var(--success-text);
 }
 
 .resultError {
-	background: #fee2e2;
-	color: #991b1b;
+	background: var(--danger-bg);
+	color: var(--danger-text);
 }

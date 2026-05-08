@@ -106,8 +106,8 @@
 }
 
 .paymentBlock {
-	background: #fffbeb;
-	border: 1.5px solid #fde68a;
+	background: var(--warning-bg-subtle);
+	border: 1.5px solid var(--warning-border);
 	border-radius: 12px;
 	padding: 12px 14px;
 }
@@ -123,7 +123,7 @@
 	font-family: 'Barlow Condensed', sans-serif;
 	font-weight: 700;
 	font-size: 15px;
-	color: #92400e;
+	color: var(--warning-text);
 }
 
 .payBtn {
@@ -132,7 +132,7 @@
 	font-size: 13px;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
-	background: #92400e;
+	background: var(--warning-text);
 	color: #fff;
 	border: none;
 	border-radius: 8px;
@@ -168,13 +168,13 @@
 }
 
 .payMethodItemCopyable:active {
-	background: #fde68a;
+	background: var(--warning-border);
 }
 
 .payMethodCopy {
 	margin-left: auto;
 	font-size: 14px;
-	color: #b45309;
+	color: var(--warning-dark);
 	opacity: 0.6;
 	flex-shrink: 0;
 }
@@ -194,17 +194,17 @@
 .payMethodLabel {
 	font-size: 12px;
 	font-weight: 600;
-	color: #92400e;
+	color: var(--warning-text);
 }
 
 .payMethodValue {
 	font-size: 13px;
-	color: #78350f;
+	color: var(--warning-text);
 }
 
 .payMethodText {
 	font-size: 13px;
-	color: #78350f;
+	color: var(--warning-text);
 	white-space: pre-wrap;
 	line-height: 1.5;
 }
@@ -278,20 +278,20 @@
 
 .countFull {
 	font-size: 14px;
-	color: #dc2626;
+	color: var(--danger);
 	font-weight: 700;
 }
 
 .countReserve {
 	font-size: 14px;
-	color: #d97706;
+	color: var(--warning);
 	font-weight: 700;
 }
 
 .reserveNote {
 	font-size: 12px;
-	color: #d97706;
-	background: #fef3c7;
+	color: var(--warning);
+	background: var(--warning-bg);
 	padding: 2px 8px;
 	border-radius: 50px;
 	font-weight: 700;
@@ -357,7 +357,7 @@
 .confirmed {
 	font-size: 11px;
 	font-weight: 800;
-	color: #059669;
+	color: var(--success);
 	margin-left: auto;
 }
 
@@ -366,7 +366,7 @@
 	align-items: center;
 	gap: 8px;
 	margin: 12px 0 8px;
-	color: #d97706;
+	color: var(--warning);
 	font-size: 11px;
 	font-weight: 700;
 	text-transform: uppercase;
@@ -378,7 +378,7 @@
 	content: '';
 	flex: 1;
 	height: 1px;
-	background: #fde68a;
+	background: var(--warning-border);
 }
 
 .participantsLoading {
@@ -639,18 +639,18 @@
 }
 
 .btnRegistered {
-	background: #fee2e2;
-	color: #991b1b;
+	background: var(--danger-bg);
+	color: var(--danger-text);
 }
 
 .btnReserved {
-	background: #fef3c7;
-	color: #92400e;
+	background: var(--warning-bg);
+	color: var(--warning-text);
 }
 
 .btnReserve {
-	background: #fef3c7;
-	color: #92400e;
+	background: var(--warning-bg);
+	color: var(--warning-text);
 }
 
 .btnFull {
@@ -697,18 +697,18 @@
 
 .removeGuestBtn {
 	background: none;
-	border: 1.5px solid #fecaca;
+	border: 1.5px solid var(--danger-border);
 	border-radius: 10px;
 	padding: 6px 12px;
 	font-size: 13px;
-	color: #dc2626;
+	color: var(--danger);
 	cursor: pointer;
 	white-space: nowrap;
 	transition: border-color 0.15s, background 0.15s;
 }
 
 .removeGuestBtn:active {
-	background: #fee2e2;
+	background: var(--danger-bg);
 }
 
 .removeGuestBtn:disabled {

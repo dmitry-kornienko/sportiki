@@ -88,8 +88,8 @@
 }
 
 .removeBtn:active {
-	background: #fee2e2;
-	color: #dc2626;
+	background: var(--danger-bg);
+	color: var(--danger);
 }
 
 .footer {

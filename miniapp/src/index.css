@@ -18,6 +18,24 @@
 	--card-bg: #ffffff;
 	--border: #e0ddd8;
 	--nav-h: 64px;
+	--text: #0d0d0d;
+
+	--success: #059669;
+	--success-bg: #d1fae5;
+	--success-text: #065f46;
+	--success-border: #34d399;
+
+	--danger: #dc2626;
+	--danger-bg: #fee2e2;
+	--danger-text: #991b1b;
+	--danger-border: #fecaca;
+
+	--warning: #d97706;
+	--warning-bg: #fef3c7;
+	--warning-bg-subtle: #fffbeb;
+	--warning-border: #fde68a;
+	--warning-text: #92400e;
+	--warning-dark: #b45309;
 }
 
 html,

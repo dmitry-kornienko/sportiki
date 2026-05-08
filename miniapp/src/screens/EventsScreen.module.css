@@ -60,5 +60,5 @@
 	text-align: center;
 	padding: 40px 20px;
 	font-size: 14px;
-	color: #dc2626;
+	color: var(--danger);
 }
