@@ -85,13 +85,24 @@ const EventsController = {
 	create(body, user) {
 		if (!isAdmin(user.id)) return Response.error('Доступ запрещён', 403)
 
-		const { type, title, date, time, maxPeople, reserveLimit, info, location, price, paymentInfo } = body
+		const {
+			type,
+			title,
+			date,
+			time,
+			maxPeople,
+			reserveLimit,
+			info,
+			location,
+			price,
+			paymentInfo,
+		} = body
 
-		if (!type?.trim())     return Response.error('Не указан type')
-		if (!title?.trim())    return Response.error('Не указан title')
-		if (!date?.trim())     return Response.error('Не указана date')
-		if (!time?.trim())     return Response.error('Не указано time')
-		if (!info?.trim())     return Response.error('Не указан info')
+		if (!type?.trim()) return Response.error('Не указан type')
+		if (!title?.trim()) return Response.error('Не указан title')
+		if (!date?.trim()) return Response.error('Не указана date')
+		if (!time?.trim()) return Response.error('Не указано time')
+		if (!info?.trim()) return Response.error('Не указан info')
 		if (!location?.trim()) return Response.error('Не указана location')
 
 		if (!/^\d{2}\.\d{2}\.\d{4}$/.test(date)) {
@@ -102,10 +113,13 @@ const EventsController = {
 		}
 
 		const maxPeopleNum = parseInt(maxPeople) || 0
-		if (maxPeopleNum < 0) return Response.error('maxPeople не может быть отрицательным')
+		if (maxPeopleNum < 0)
+			return Response.error('maxPeople не может быть отрицательным')
 
-		const reserveLimitNum = maxPeopleNum > 0 ? (parseInt(reserveLimit) || DEFAULT_RESERVE_LIMIT) : 0
-		if (reserveLimitNum < 0) return Response.error('reserveLimit не может быть отрицательным')
+		const reserveLimitNum =
+			maxPeopleNum > 0 ? parseInt(reserveLimit) || DEFAULT_RESERVE_LIMIT : 0
+		if (reserveLimitNum < 0)
+			return Response.error('reserveLimit не может быть отрицательным')
 
 		const id = db.createEvent({
 			type: type.trim(),
