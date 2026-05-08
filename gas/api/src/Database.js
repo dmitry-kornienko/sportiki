@@ -201,6 +201,7 @@ const EventRepository = {
 				row[COL.EVENTS.TIME]         = eventData.time
 				row[COL.EVENTS.MAX_PEOPLE]   = eventData.maxPeople
 				row[COL.EVENTS.INFO]         = eventData.info
+				row[COL.EVENTS.STATUS]       = eventData.status
 				row[COL.EVENTS.LOCATION]     = eventData.location
 				row[COL.EVENTS.RESERVE_LIMIT]= eventData.reserveLimit
 				row[COL.EVENTS.PRICE]        = eventData.price || 0

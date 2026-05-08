@@ -255,6 +255,14 @@ async function handleRegisterOnly() {
 			)
 		}
 
+		if (event.status !== 'Registration_Open') {
+			return (
+				<button className={`${s.btn} ${s.btnClosed}`} disabled>
+					Запись закрыта
+				</button>
+			)
+		}
+
 		if (event.isFull && !event.hasReserve) {
 			const primaryBtn = (
 				<button className={`${s.btn} ${s.btnFull}`} disabled>

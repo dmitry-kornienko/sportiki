@@ -659,6 +659,12 @@
 	cursor: default;
 }
 
+.btnClosed {
+	background: var(--border);
+	color: var(--gray);
+	cursor: default;
+}
+
 .btnLoading {
 	background: var(--border);
 	cursor: default;

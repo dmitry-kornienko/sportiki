@@ -17,6 +17,12 @@ interface Props {
 
 const DEFAULT_RESERVE_LIMIT = 3
 
+const EVENT_STATUSES = [
+	{ value: 'Registration_Open',   label: 'Открыта запись' },
+	{ value: 'Registration_Closed', label: 'Запись закрыта' },
+	{ value: 'Archived',            label: 'Архив' },
+]
+
 const EMPTY_FORM = {
 	type: '',
 	title: '',
@@ -161,12 +167,14 @@ type Payload = {
 	type: string; title: string; date: string; time: string
 	maxPeople: number; reserveLimit: number; price: number
 	paymentInfo: string; info: string; location: string
+	status?: string
 }
 
 export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, onToast }: Props) {
 	const isEdit = !!event
 	const [form, setForm] = useState(() => event ? eventToForm(event) : EMPTY_FORM)
 	const [pay, setPay] = useState<PayMethods>(() => event ? parsePay(event.paymentInfo) : EMPTY_PAY)
+	const [status, setStatus] = useState(() => event?.status || 'Registration_Open')
 	const [loading, setLoading] = useState(false)
 	const [visible, setVisible] = useState(false)
 	const [showConfirm, setShowConfirm] = useState(false)
@@ -193,6 +201,7 @@ export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, o
 	function handleClose() {
 		setForm(isEdit ? eventToForm(event!) : EMPTY_FORM)
 		setPay(isEdit ? parsePay(event!.paymentInfo) : EMPTY_PAY)
+		setStatus(event?.status || 'Registration_Open')
 		onClose()
 	}
 
@@ -225,6 +234,7 @@ export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, o
 			paymentInfo: price > 0 ? serializePay(pay) : '',
 			info: form.info,
 			location: form.location,
+			...(isEdit ? { status } : {}),
 		}
 	}
 
@@ -232,10 +242,11 @@ export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, o
 		setLoading(true)
 		try {
 			if (isEdit) {
-				await updateEvent({ id: event!.id, ...payload })
+				await updateEvent({ id: event!.id, status: payload.status!, ...payload })
 				const updated: Event = {
 					...event!,
 					...payload,
+					status: payload.status!,
 					isFull: payload.maxPeople > 0 && event!.mainCount >= payload.maxPeople,
 					hasReserve: payload.maxPeople > 0 && payload.reserveLimit > 0,
 				}
@@ -246,7 +257,7 @@ export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, o
 				const newEvent: Event = {
 					id: result.id,
 					...payload,
-					status: 'OPEN',
+					status: 'Registration_Open',
 					mainCount: 0,
 					totalCount: 0,
 					isFull: false,
@@ -449,6 +460,20 @@ export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, o
 						required
 					/>
 				</div>
+				{isEdit && (
+					<div className={s.field}>
+						<label className={s.label}>Статус</label>
+						<select
+							className={s.input}
+							value={status}
+							onChange={e => setStatus(e.target.value)}
+						>
+							{EVENT_STATUSES.map(opt => (
+								<option key={opt.value} value={opt.value}>{opt.label}</option>
+							))}
+						</select>
+					</div>
+				)}
 				<button className={s.submitBtn} type='submit' disabled={loading}>
 					{loading ? <Loader /> : (isEdit ? 'Сохранить изменения' : 'Создать событие')}
 				</button>

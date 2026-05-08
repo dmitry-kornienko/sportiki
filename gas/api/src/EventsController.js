@@ -145,7 +145,7 @@ const EventsController = {
 	update(body, user) {
 		if (!isAdmin(user.id)) return Response.error('Доступ запрещён', 403)
 
-		const { id, type, title, date, time, maxPeople, reserveLimit, info, location, price, paymentInfo } = body
+		const { id, type, title, date, time, maxPeople, reserveLimit, info, location, price, paymentInfo, status } = body
 
 		if (!id?.toString().trim())  return Response.error('Не указан id')
 		if (!type?.trim())           return Response.error('Не указан type')
@@ -154,6 +154,11 @@ const EventsController = {
 		if (!time?.trim())           return Response.error('Не указано time')
 		if (!info?.trim())           return Response.error('Не указан info')
 		if (!location?.trim())       return Response.error('Не указана location')
+
+		const validStatuses = [EVENT_STATUS.OPEN, EVENT_STATUS.CLOSED, EVENT_STATUS.ARCHIVED]
+		const statusVal = status?.trim()
+		if (!statusVal || !validStatuses.includes(statusVal))
+			return Response.error('Неверный статус события')
 
 		if (!/^\d{2}\.\d{2}\.\d{4}$/.test(date))
 			return Response.error('Неверный формат date: ожидается ДД.ММ.ГГГГ')
@@ -173,6 +178,7 @@ const EventsController = {
 			maxPeople: maxPeopleNum,
 			reserveLimit: reserveLimitNum,
 			info: info.trim(),
+			status: statusVal,
 			location: location.trim(),
 			price: price || 0,
 			paymentInfo: paymentInfo?.trim() || '',
