@@ -187,6 +187,32 @@ const EventRepository = {
 		return id
 	},
 
+	update(id, eventData) {
+		const sheet = SheetCache.sheet(SHEET_NAMES.EVENTS)
+		const data = SheetCache.data(SHEET_NAMES.EVENTS)
+		const target = id.toString()
+		for (let i = 1; i < data.length; i++) {
+			if (data[i][COL.EVENTS.ID].toString() === target) {
+				const rowNum = i + 1
+				const row = [...data[i]]
+				row[COL.EVENTS.TYPE]         = eventData.type
+				row[COL.EVENTS.TITLE]        = eventData.title
+				row[COL.EVENTS.DATE]         = eventData.date
+				row[COL.EVENTS.TIME]         = eventData.time
+				row[COL.EVENTS.MAX_PEOPLE]   = eventData.maxPeople
+				row[COL.EVENTS.INFO]         = eventData.info
+				row[COL.EVENTS.LOCATION]     = eventData.location
+				row[COL.EVENTS.RESERVE_LIMIT]= eventData.reserveLimit
+				row[COL.EVENTS.PRICE]        = eventData.price || 0
+				row[COL.EVENTS.PAYMENT_INFO] = eventData.paymentInfo || ''
+				sheet.getRange(rowNum, 1, 1, row.length).setValues([row])
+				SheetCache.invalidate(SHEET_NAMES.EVENTS)
+				return true
+			}
+		}
+		return false
+	},
+
 	_parseDate(dateStr) {
 		try {
 			const [d, m, y] = dateStr.split('.')
@@ -333,6 +359,83 @@ const RegRepository = {
 		}
 		return false
 	},
+
+	// Переводит первые N участников из резерва в основной состав.
+	// Возвращает массив { chatId, name } переведённых.
+	promoteFirstN(eventId, count) {
+		const data = SheetCache.data(SHEET_NAMES.REGS)
+		const sheet = SheetCache.sheet(SHEET_NAMES.REGS)
+		const eId = eventId.toString()
+		const promoted = []
+		for (let i = 1; i < data.length && promoted.length < count; i++) {
+			const row = data[i]
+			if (
+				row[COL.REGS.EVENT_ID]?.toString().trim() === eId &&
+				row[COL.REGS.STATUS]?.toString().trim() === REG_STATUS.RESERVE
+			) {
+				sheet.getRange(i + 1, COL.REGS.STATUS + 1).setValue(REG_STATUS.MAIN)
+				promoted.push({ chatId: row[COL.REGS.CHAT_ID].toString(), name: row[COL.REGS.NAME]?.toString() || '' })
+			}
+		}
+		if (promoted.length > 0) SheetCache.invalidate(SHEET_NAMES.REGS)
+		return promoted
+	},
+
+	// Переводит последних N участников основного состава в резерв.
+	// «Последние» — по порядку строк (= порядку регистрации).
+	// Возвращает массив { chatId, name } переведённых.
+	demoteLastMain(eventId, count) {
+		const data = SheetCache.data(SHEET_NAMES.REGS)
+		const sheet = SheetCache.sheet(SHEET_NAMES.REGS)
+		const eId = eventId.toString()
+		const mainIndices = []
+		for (let i = 1; i < data.length; i++) {
+			const row = data[i]
+			if (
+				row[COL.REGS.EVENT_ID]?.toString().trim() === eId &&
+				row[COL.REGS.STATUS]?.toString().trim() === REG_STATUS.MAIN
+			) {
+				mainIndices.push(i)
+			}
+		}
+		const todemote = mainIndices.slice(-count)
+		const demoted = []
+		todemote.forEach(i => {
+			const row = data[i]
+			sheet.getRange(i + 1, COL.REGS.STATUS + 1).setValue(REG_STATUS.RESERVE)
+			demoted.push({ chatId: row[COL.REGS.CHAT_ID].toString(), name: row[COL.REGS.NAME]?.toString() || '' })
+		})
+		if (demoted.length > 0) SheetCache.invalidate(SHEET_NAMES.REGS)
+		return demoted
+	},
+
+	// Удаляет последних N участников резерва.
+	// Возвращает массив { chatId, name } удалённых.
+	deleteLastReserve(eventId, count) {
+		const data = SheetCache.data(SHEET_NAMES.REGS)
+		const sheet = SheetCache.sheet(SHEET_NAMES.REGS)
+		const eId = eventId.toString()
+		const reserveIndices = []
+		for (let i = 1; i < data.length; i++) {
+			const row = data[i]
+			if (
+				row[COL.REGS.EVENT_ID]?.toString().trim() === eId &&
+				row[COL.REGS.STATUS]?.toString().trim() === REG_STATUS.RESERVE
+			) {
+				reserveIndices.push(i)
+			}
+		}
+		const toDelete = reserveIndices.slice(-count)
+		const deleted = []
+		// Удаляем в обратном порядке чтобы индексы строк оставались валидными
+		toDelete.slice().reverse().forEach(i => {
+			const row = data[i]
+			deleted.unshift({ chatId: row[COL.REGS.CHAT_ID].toString(), name: row[COL.REGS.NAME]?.toString() || '' })
+			sheet.deleteRow(i + 1)
+		})
+		if (deleted.length > 0) SheetCache.invalidate(SHEET_NAMES.REGS)
+		return deleted
+	},
 }
 
 // --- UserRepository ---
@@ -371,6 +474,9 @@ const db = {
 	createEvent(eventData) {
 		return EventRepository.create(eventData)
 	},
+	updateEvent(id, eventData) {
+		return EventRepository.update(id, eventData)
+	},
 	getRegsByEvent(eventId) {
 		return RegRepository.getByEvent(eventId)
 	},
@@ -397,6 +503,15 @@ const db = {
 	},
 	promoteFirstReserve(eventId) {
 		return RegRepository.promoteFirstReserve(eventId)
+	},
+	promoteFirstN(eventId, count) {
+		return RegRepository.promoteFirstN(eventId, count)
+	},
+	demoteLastMain(eventId, count) {
+		return RegRepository.demoteLastMain(eventId, count)
+	},
+	deleteLastReserve(eventId, count) {
+		return RegRepository.deleteLastReserve(eventId, count)
 	},
 	findOrCreateUser(chatId, from) {
 		return UserRepository.findOrCreate(chatId, from)

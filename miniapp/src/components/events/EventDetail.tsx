@@ -5,6 +5,8 @@ import { register, unregister, registerGuest, unregisterGuest } from '../../api/
 import type { Event, Registration } from '../../types'
 import { Loader } from '../ui/Loader'
 import { fmt } from '../../utils/format'
+import { isAdmin } from '../../utils/telegram'
+import { CreateEventSheet } from './CreateEventSheet'
 import s from './EventDetail.module.css'
 
 const PAY_LABELS: Record<string, { icon: string; label: string }> = {
@@ -60,6 +62,7 @@ export function EventDetail({
 	const [guestLoading, setGuestLoading] = useState(false)
 	const [showPaySheet, setShowPaySheet] = useState(false)
 	const [payFile, setPayFile] = useState<File | null>(null)
+	const [showEdit, setShowEdit] = useState(false)
 
 	const spotsLeft = event.maxPeople === 0
 		? Infinity
@@ -306,6 +309,11 @@ async function handleRegisterOnly() {
 					←
 				</button>
 				<div className={s.headerTitle}>Назад</div>
+				{isAdmin() && (
+					<button className={s.editBtn} onClick={() => setShowEdit(true)}>
+						Редактировать
+					</button>
+				)}
 			</div>
 
 			<div className={s.body}>
@@ -543,6 +551,19 @@ async function handleRegisterOnly() {
 			</>,
 			document.body
 		)}
+		{showEdit && (
+			<CreateEventSheet
+				open={showEdit}
+				event={event}
+				onUpdated={() => {
+					setShowEdit(false)
+					refreshEvent()
+				}}
+				onClose={() => setShowEdit(false)}
+				onToast={onToast}
+			/>
+		)}
+
 		{showPaySheet && createPortal(
 			<>
 				<div className={s.sheetBackdrop} onClick={() => { setShowPaySheet(false); setPayFile(null) }} />

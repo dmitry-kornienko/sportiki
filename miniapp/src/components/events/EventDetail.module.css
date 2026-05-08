@@ -37,6 +37,25 @@
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	flex: 1;
+}
+
+.editBtn {
+	margin-left: auto;
+	background: none;
+	border: 1.5px solid var(--border);
+	border-radius: 20px;
+	padding: 5px 12px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--text);
+	cursor: pointer;
+	flex-shrink: 0;
+	transition: background 0.15s;
+}
+
+.editBtn:active {
+	background: var(--light);
 }
 
 .body {

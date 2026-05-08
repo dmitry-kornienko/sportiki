@@ -201,3 +201,109 @@
 	background: var(--gray);
 	cursor: default;
 }
+
+/* Confirmation sheet */
+
+.confirmBackdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 300;
+	background: rgba(0, 0, 0, 0.4);
+}
+
+.confirmSheet {
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 301;
+	background: var(--white);
+	border-radius: 20px 20px 0 0;
+	padding: 20px 20px 32px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.confirmTitle {
+	font-family: 'Barlow Condensed', sans-serif;
+	font-weight: 800;
+	font-size: 17px;
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	color: var(--text);
+	margin-bottom: 4px;
+}
+
+.impactRow {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	font-size: 14px;
+	color: var(--text);
+}
+
+.impactIcon {
+	font-size: 16px;
+	line-height: 1.4;
+	flex-shrink: 0;
+}
+
+.impactSection {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.impactList {
+	list-style: none;
+	margin: 0;
+	padding: 0 0 0 28px;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.impactList li {
+	font-size: 13px;
+	color: var(--gray);
+}
+
+.impactList li::before {
+	content: '• ';
+}
+
+.confirmActions {
+	display: flex;
+	gap: 10px;
+	margin-top: 8px;
+}
+
+.confirmCancel {
+	flex: 1;
+	background: var(--light);
+	border: 1.5px solid var(--border);
+	border-radius: 12px;
+	padding: 12px;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--text);
+	cursor: pointer;
+}
+
+.confirmOk {
+	flex: 2;
+	background: var(--accent);
+	border: none;
+	border-radius: 12px;
+	padding: 12px;
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--white);
+	cursor: pointer;
+}
+
+.confirmOk:disabled {
+	background: var(--gray);
+	cursor: default;
+}

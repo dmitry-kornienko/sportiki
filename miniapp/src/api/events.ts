@@ -22,6 +22,14 @@ export function fetchEvent(id: string): Promise<Event> {
 	return get<Event>({ action: 'event', id })
 }
 
+export interface UpdateEventPayload extends CreateEventPayload {
+	id: string
+}
+
 export function createEvent(payload: CreateEventPayload): Promise<{ id: string }> {
 	return post<{ id: string }>({ action: 'create_event', ...payload })
+}
+
+export function updateEvent(payload: UpdateEventPayload): Promise<{ id: string }> {
+	return post<{ id: string }>({ action: 'update_event', ...payload })
 }

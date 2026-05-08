@@ -136,4 +136,115 @@ const EventsController = {
 
 		return Response.ok({ id })
 	},
+
+	/**
+	 * POST action=update_event
+	 * Body: { id, type, title, date, time, maxPeople, reserveLimit, info, location, price, paymentInfo }
+	 * Только для администраторов.
+	 */
+	update(body, user) {
+		if (!isAdmin(user.id)) return Response.error('Доступ запрещён', 403)
+
+		const { id, type, title, date, time, maxPeople, reserveLimit, info, location, price, paymentInfo } = body
+
+		if (!id?.toString().trim())  return Response.error('Не указан id')
+		if (!type?.trim())           return Response.error('Не указан type')
+		if (!title?.trim())          return Response.error('Не указан title')
+		if (!date?.trim())           return Response.error('Не указана date')
+		if (!time?.trim())           return Response.error('Не указано time')
+		if (!info?.trim())           return Response.error('Не указан info')
+		if (!location?.trim())       return Response.error('Не указана location')
+
+		if (!/^\d{2}\.\d{2}\.\d{4}$/.test(date))
+			return Response.error('Неверный формат date: ожидается ДД.ММ.ГГГГ')
+		if (!/^\d{2}:\d{2}$/.test(time))
+			return Response.error('Неверный формат time: ожидается ЧЧ:ММ')
+
+		const maxPeopleNum = parseInt(maxPeople) || 0
+		if (maxPeopleNum < 0) return Response.error('maxPeople не может быть отрицательным')
+
+		const reserveLimitNum = maxPeopleNum > 0 ? (parseInt(reserveLimit) || DEFAULT_RESERVE_LIMIT) : 0
+
+		const found = db.updateEvent(id.toString(), {
+			type: type.trim(),
+			title: title.trim(),
+			date: date.trim(),
+			time: time.trim(),
+			maxPeople: maxPeopleNum,
+			reserveLimit: reserveLimitNum,
+			info: info.trim(),
+			location: location.trim(),
+			price: price || 0,
+			paymentInfo: paymentInfo?.trim() || '',
+		})
+
+		if (!found) return Response.error('Событие не найдено', 404)
+
+		this._rebalance(id.toString(), type.trim(), title.trim(), date.trim(), time.trim(), maxPeopleNum, reserveLimitNum)
+
+		return Response.ok({ id })
+	},
+
+	/**
+	 * Ребалансирует участников после изменения лимитов.
+	 * Уведомляет затронутых участников через Telegram.
+	 */
+	_rebalance(eventId, eventType, eventTitle, eventDate, eventTime, newMaxPeople, newReserveLimit) {
+		if (newMaxPeople === 0) return
+
+		const regs = db.getRegsByEvent(eventId)
+		const mainCount = regs.filter(r => r.status === REG_STATUS.MAIN).length
+		const reserveCount = regs.filter(r => r.status === REG_STATUS.RESERVE).length
+
+		const eventLine = (eventType ? eventType + ' ' : '') + eventTitle
+		const msgPromoted =
+			`🎉 Отличные новости!\n\n` +
+			`Вы в основном составе на событие:\n${eventLine}\n\n` +
+			`📅 ${eventDate}\n🕐 ${eventTime}\n\n` +
+			`До встречи на старте 🙌`
+		const msgDemoted =
+			`ℹ️ Обновление по вашей записи:\n\n` +
+			`Из-за изменения лимита участников вы были переведены в резерв на событие:\n${eventLine}\n\n` +
+			`📅 ${eventDate}\n🕐 ${eventTime}\n\n` +
+			`Если место освободится — вы автоматически попадёте в основной состав 👍`
+		const msgDeleted =
+			`😔 К сожалению, организатор уменьшил лимит участников, поэтому ваша запись была отменена.\n\n` +
+			`Событие:\n${eventLine}\n\n` +
+			`📅 ${eventDate}\n🕐 ${eventTime}\n\n` +
+			`Вы можете записаться снова, если появятся свободные места.`
+
+		const notifications = []
+
+		if (newMaxPeople > mainCount) {
+			const toPromote = Math.min(reserveCount, newMaxPeople - mainCount)
+			if (toPromote > 0) {
+				const promoted = db.promoteFirstN(eventId, toPromote)
+				promoted.forEach(r => notifications.push({ chatId: r.chatId, text: msgPromoted }))
+			}
+			const reserveAfter = reserveCount - toPromote
+			if (reserveAfter > newReserveLimit) {
+				const toDelete = reserveAfter - newReserveLimit
+				const deleted = db.deleteLastReserve(eventId, toDelete)
+				deleted.forEach(r => notifications.push({ chatId: r.chatId, text: msgDeleted }))
+			}
+		} else if (newMaxPeople < mainCount) {
+			const toDemote = mainCount - newMaxPeople
+			const demoted = db.demoteLastMain(eventId, toDemote)
+			demoted.forEach(r => notifications.push({ chatId: r.chatId, text: msgDemoted }))
+			const reserveAfter = reserveCount + toDemote
+			if (reserveAfter > newReserveLimit) {
+				const toDelete = reserveAfter - newReserveLimit
+				const deleted = db.deleteLastReserve(eventId, toDelete)
+				deleted.forEach(r => notifications.push({ chatId: r.chatId, text: msgDeleted }))
+			}
+		} else {
+			if (reserveCount > newReserveLimit) {
+				const toDelete = reserveCount - newReserveLimit
+				const deleted = db.deleteLastReserve(eventId, toDelete)
+				deleted.forEach(r => notifications.push({ chatId: r.chatId, text: msgDeleted }))
+			}
+		}
+
+		notifications.forEach(({ chatId, text }) => sendTelegramMessage(chatId, text))
+	},
 }
