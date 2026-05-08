@@ -290,7 +290,7 @@ export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, o
 
 	const price = parseInt(form.price) || 0
 
-	return (
+	return createPortal(
 		<div className={`${s.overlay} ${visible ? s.active : ''}`}>
 			<div className={s.header}>
 				<button className={s.backBtn} onClick={handleClose} type='button'>
@@ -508,6 +508,7 @@ export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, o
 				</>,
 				document.body
 			)}
-		</div>
+		</div>,
+		document.body
 	)
 }
