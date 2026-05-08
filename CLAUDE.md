@@ -1,438 +1,164 @@
-# CLAUDE.md — Sportiki Project
+# CLAUDE.md — Sportiki
 
-## ОБЗОР ПРОЕКТА
+## ПРОЕКТ
 
-**Sportiki** — платформа для экспат-комьюнити Da Nang (Вьетнам).
-Автоматизирует запись на спортивные и социальные активности, управление мерч-магазином и проверку билетов.
+**Sportiki** — Telegram Mini App для экспат-комьюнити Da Nang (Вьетнам).
+Запись на события, мерч-магазин, проверка QR-билетов.
 
 ---
 
-## МОНОРЕПО СТРУКТУРА
+## СТРУКТУРА
 
 ```
 sportiki/
-├── miniapp/                    ← React + TypeScript (Vite)
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── layout/         ← Header, BottomNav
-│   │   │   ├── merch/          ← ProductGrid, ProductCard, Cart, ...
-│   │   │   ├── events/         ← EventList, EventCard, ...
-│   │   │   ├── scanner/        ← Scanner
-│   │   │   └── ui/             ← Toast, Overlay, EmptyState, Button, ...
-│   │   ├── screens/            ← EventsScreen, MerchScreen, ScannerScreen
-│   │   ├── hooks/              ← useCart, useTelegram, useEvents
-│   │   ├── types/              ← index.ts (все типы)
-│   │   ├── data/               ← products.ts (захардкоженные товары)
-│   │   ├── api/                ← клиент для GAS API
-│   │   │   ├── client.ts       ← базовый fetch wrapper
-│   │   │   ├── events.ts       ← запросы к /events
-│   │   │   └── registrations.ts
-│   │   ├── utils/              ← format.ts, telegram.ts
-│   │   ├── App.tsx
-│   │   ├── main.tsx
-│   │   └── index.css
-│   ├── public/
-│   │   └── images/             ← фото товаров
-│   ├── package.json
-│   ├── vite.config.ts
-│   └── tsconfig.json
-│
+├── miniapp/          ← React 18 + TypeScript + Vite → GitHub Pages
+│   └── src/
+│       ├── api/          ← client.ts, events.ts, registrations.ts
+│       ├── components/
+│       │   ├── events/   ← EventCard, EventDetail, CreateEventSheet
+│       │   ├── merch/    ← ProductCard, ProductDetail, Cart
+│       │   ├── scanner/  ← Scanner
+│       │   ├── layout/   ← Header, BottomNav
+│       │   └── ui/       ← Toast, EmptyState, Loader
+│       ├── hooks/        ← useEvents, useCart, useTelegram
+│       ├── screens/      ← EventsScreen, MerchScreen, ScannerScreen
+│       ├── types/        ← index.ts
+│       ├── data/         ← products.ts (товары захардкожены)
+│       └── utils/        ← format.ts, telegram.ts
 ├── gas/
-│   ├── bot/                    ← Telegram бот (стабильный, не трогаем без нужды)
-│   │   ├── src/
-│   │   │   ├── Config.js
-│   │   │   ├── Database.js
-│   │   │   ├── Validator.js
-│   │   │   ├── Texts.js
-│   │   │   ├── Keyboards.js
-│   │   │   ├── Admin.js
-│   │   │   ├── Main.js
-│   │   │   ├── Reminders.js
-│   │   │   │── Setup.js
-│   │   │   └── appsscript.json
-│   │   ├── .clasp.dev.json
-│   │   ├── .clasp.prod.json
-│   │   └── package.json        ← clasp скрипты для бота
-│   │
-│   └── api/                    ← GAS REST API (строим параллельно)
-│       ├── src/
-│       │   ├── Config.js       ← общие константы, доступ к Sheets
-│       │   ├── Database.js     ← тот же слой данных что и в боте
-│       │   ├── Router.js       ← doGet/doPost → контроллеры
-│       │   ├── Auth.js         ← проверка Telegram initData
-│       │   ├── EventsController.js
-│       │   ├── RegistrationsController.js
-│       │   ├── UsersController.js
-│       │   ├── Response.js     ← helpers: ok(), error()
-│       │   └── appsscript.json
-│       ├── .clasp.dev.json
-│       ├── .clasp.prod.json
-│       └── package.json        ← clasp скрипты для API
-│
-├── .github/
-│   └── workflows/
-│       ├── deploy-bot.yml      ← пуш бота при merge в main
-│       ├── deploy-api.yml      ← пуш API при merge в main
-│       └── deploy-miniapp.yml  ← сборка и деплой на GitHub Pages
-│
-├── CLAUDE.md                   ← этот файл
-├── .gitignore
-└── package.json                ← корневой, делегирует через --prefix
+│   ├── bot/          ← Telegram бот (стабильный, не трогаем без нужды)
+│   └── api/          ← REST API поверх Google Sheets
+│       └── src/      ← Config.js, Router.js, Auth.js, Database.js
+│                        EventsController.js, RegistrationsController.js
+│                        UsersController.js, Response.js
+└── .github/workflows/ ← deploy-bot/api/miniapp (main) + deploy-miniapp-dev (dev)
 ```
 
 ---
 
-## ЧАСТЬ 1: TELEGRAM БОТ (`gas/bot`)
+## TELEGRAM БОТ (`gas/bot`)
 
-### Назначение (сейчас и навсегда)
+**Роль:** `/start` → меню + кнопка Mini App, уведомления о ребалансе, напоминания за 24ч, рассылки, приём мерч-заказов через Web App Data.
 
-Бот остаётся как:
+Весь пользовательский UI переехал в Mini App. **Бот не трогаем без необходимости.**
 
-- **Точка входа** — `/start` → приветствие + кнопка открыть Mini App
-- **Система уведомлений** — напоминания за 24ч, перевод из резерва
-- **Рассылки** — массовые сообщения от админа (всем / по событию)
-- **Уведомления мерча** — сообщение менеджеру о новом заказе
+**Script Properties:** `BOT_TOKEN`, `WEBHOOK_SECRET`, `OWNER_ID`, `ADMIN_IDS`, `MERCH_MANAGER_ID`
 
-Весь пользовательский функционал (события, регистрация, мерч) постепенно переезжает в Mini App.
-
-### Стек
-
-- Google Apps Script (V8 runtime)
-- Google Sheets как БД
-- Telegram Bot API
-
-### Script Properties (настраивать отдельно для dev и prod)
-
-| Ключ               | Описание                                 |
-| ------------------ | ---------------------------------------- |
-| `BOT_TOKEN`        | Токен Telegram бота                      |
-| `WEBHOOK_SECRET`   | Секрет для верификации webhook           |
-| `OWNER_ID`         | Telegram ID владельца                    |
-| `ADMIN_IDS`        | Telegram ID доп. админов (через запятую) |
-| `MERCH_MANAGER_ID` | Telegram ID менеджера магазина           |
-
-### Google Sheets — структура
-
-**Events**
-| ID | Type | Title | Date | Time | MaxPeople | Info | Status | Location | ReminderSent |
-
-**Registrations**
-| ChatID | EventID | Name | RegDate | Status | Username | TgName | IsGuest | Confirmation |
-
-**Users**
-| ChatID | Username | FirstName | CreatedAt | LastSeen |
-
-**States**
-| ChatID | State | TempData |
-
-### Ключевые решения
-
-- `doPost` — без `return ContentService.createTextOutput()` (с ним Telegram дублирует запросы)
-- `SheetCache` — кэш данных на время одного запроса
-- `withLock()` — защита от race conditions при регистрации
-- `editMessageText` — редактирование сообщений вместо новых при навигации
-- `UserRepository.register()` — не обновляет существующих (оптимизация)
-- `_formatDate/_formatTime` — конвертация Date объектов GAS → строки
-
-### Статусы событий
-
-- `Registration_Open` — открыта запись
-- `Registration_Closed` — запись закрыта
-- `Archived` — архив
-
-### Статусы регистраций
-
-- `MAIN` — основной состав
-- `RESERVE` — резерв (лимит +20 мест)
-
-### Лимиты
-
-- `RESERVE_LIMIT = 20`
-- `REG_LIMIT_PER_USER = 2` (сам + гость)
+**Важно:** `doPost` без `return ContentService.createTextOutput()` — иначе Telegram дублирует запросы.
 
 ---
 
-## ЧАСТЬ 2: GAS API (`gas/api`)
+## GAS API (`gas/api`)
 
-### Назначение
+**Endpoints:**
 
-Чистый REST API поверх тех же Google Sheets. Mini App общается только с ним.
-Строится параллельно с ботом, постепенно забирает функционал.
+| Метод | action | Контроллер |
+|-------|--------|------------|
+| GET | `events` | EventsController.list |
+| GET | `event&id=X` | EventsController.get |
+| GET | `registrations` | RegistrationsController.list |
+| GET | `me` | UsersController.me |
+| POST | `register_user` | UsersController.registerUser |
+| POST | `register` | RegistrationsController.create |
+| POST | `unregister` | RegistrationsController.remove |
+| POST | `register_guest` | RegistrationsController.registerGuest |
+| POST | `unregister_guest` | RegistrationsController.removeGuest |
+| POST | `create_event` | EventsController.create |
+| POST | `update_event` | EventsController.update + _rebalance |
 
-### Архитектура
+**Формат:** `{ ok: true, data: {...} }` / `{ ok: false, error: '...' }`
 
-```
-doGet(e) / doPost(e)
-  → Router.route(e)
-    → Auth.verify(e)          ← проверка Telegram initData
-    → EventsController
-    → RegistrationsController
-    → UsersController
-      → Database (те же репозитории)
-        → Google Sheets
-```
+**Auth:** `X-Telegram-Init-Data` header → `Auth.js` верифицирует HMAC-SHA256.
+⚠️ Использовать `computeHmacSignature` с `Byte[]`, НЕ `computeHmacSha256Signature` со строкой.
 
-### Endpoints
+**Ребаланс при `update_event`** (`EventsController._rebalance`):
+- `maxPeople` вырос → продвигает из резерва в основу с уведомлением
+- `maxPeople` уменьшился → демоутит лишних в резерв; при переполнении — удаляет с уведомлением
+- `maxPeople` → 0 (без лимита) → переводит всех резервников в основу с уведомлением
+- `reserveLimit` уменьшился → удаляет лишних из резерва с уведомлением
 
-```
-GET  ?action=events                        → список активных событий
-GET  ?action=event&id=123                  → детали события
-GET  ?action=registrations&userId=456      → мои записи
-POST ?action=register                      → записаться на событие
-POST ?action=unregister                    → отменить запись
-POST ?action=order                         → заявка на мерч
-GET  ?action=ticket&token=abc              → валидация QR билета
-```
-
-### Формат ответов
-
-```javascript
-// Успех
-{ ok: true, data: { ... } }
-
-// Ошибка
-{ ok: false, error: 'Описание ошибки' }
-```
-
-### Аутентификация
-
-Telegram Mini App передаёт `initData` в каждом запросе.
-`Auth.js` верифицирует подпись через HMAC-SHA256 с `BOT_TOKEN`.
-
-### Script Properties
-
-| Ключ              | Описание                 |
-| ----------------- | ------------------------ |
-| `BOT_TOKEN`       | Для верификации initData |
-| `SPREADSHEET_ID`  | ID той же Google Таблицы |
-| `ALLOWED_ORIGINS` | CORS (url Mini App)      |
+**Script Properties:** `BOT_TOKEN`, `SPREADSHEET_ID`, `ALLOWED_ORIGINS`
 
 ---
 
-## ЧАСТЬ 3: MINI APP (`miniapp`)
+## MINI APP (`miniapp`)
 
-### Стек
+**Стек:** React 18, TypeScript, Vite, CSS Modules, GitHub Pages
 
-- React 18 + TypeScript
-- Vite (сборка)
-- CSS Modules
-- GitHub Pages (хостинг)
+**Экраны** (нижняя панель):
+- **EventsScreen** — список событий, детали, регистрация/отмена, гости, создание/редактирование (admin)
+- **MerchScreen** — каталог (2 товара в `data/products.ts`) + корзина → `sendData` в бот
+- **ScannerScreen** — QR сканер (только admin, каркас)
 
-### Навигация
-
-```
-Нижняя панель:
-  📅 События    👕 Мерч    🎫 Сканер (только ADMIN_IDS)
-
-Внутри Мерч:
-  [Каталог]    [Корзина 🔴2]
-```
-
-### Определение администратора
-
-```typescript
+**Определение admin:**
+```ts
 const ADMIN_IDS = ['1771173222', '1397144271']
-const uid = String(window.Telegram?.WebApp?.initDataUnsafe?.user?.id || '')
-const isAdmin = ADMIN_IDS.includes(uid)
+const isAdmin = ADMIN_IDS.includes(String(tg?.initDataUnsafe?.user?.id))
 ```
 
-Вкладка Сканер не рендерится в DOM для обычных пользователей.
-
-### Флоу мерча
-
+**Env:**
 ```
-Каталог → ProductDetail (overlay)
-  → выбор цвета → Добавить в корзину
-  → подвкладка Корзина
-  → Оформить заявку
-  → Telegram.WebApp.sendData(JSON) → бот уведомляет менеджера
-  (в будущем: POST /api?action=order)
+VITE_API_URL=https://script.google.com/macros/s/.../exec
+VITE_BASE=/sportiki/    # или /sportiki/dev/
 ```
 
-### API клиент (`src/api/client.ts`)
+**Шторки/модалки** → всегда `createPortal`, иначе iOS overflow ломает z-index.
 
-```typescript
-const API_URL = import.meta.env.VITE_API_URL
+---
 
-async function request<T>(params: Record<string, string>): Promise<T> {
-	const tg = window.Telegram?.WebApp
-	const url = new URL(API_URL)
-	Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v))
+## GOOGLE SHEETS
 
-	const res = await fetch(url.toString(), {
-		headers: {
-			'X-Telegram-Init-Data': tg?.initData || '',
-		},
-	})
+→ Детальная схема колонок: [SHEETS.md](SHEETS.md)
 
-	const data = await res.json()
-	if (!data.ok) throw new Error(data.error)
-	return data.data
-}
-```
+Листы: **Events** (12 cols), **Registrations** (9 cols), **Users** (5 cols), **States** (только бот)
 
-### Переменные окружения
-
-```
-VITE_API_URL=https://script.google.com/macros/s/.../exec   (dev/prod разные)
-```
-
-### Товары (захардкожено в `src/data/products.ts`)
-
-```
-Футболка Sportiki — 590 000 ₫
-  Цвета: Белый, Розовый, Тёмно-синий
-
-Майка Sportiki — 490 000 ₫
-  Цвета: Белый, Чёрный
-```
+**Статусы событий:** `Registration_Open` | `Registration_Closed` | `Archived`
+**Статусы регистраций:** `MAIN` | `RESERVE`
+**Константы (GAS API Config.js):** `DEFAULT_RESERVE_LIMIT = 20`, `LIMITS.PER_USER = 2`
 
 ---
 
 ## ОКРУЖЕНИЯ
 
-### Dev
+| | Dev | Prod |
+|--|-----|------|
+| Mini App | localhost:5173 | dmitry-kornienko.github.io/sportiki |
+| GAS API | dev script | prod script |
+| GAS Bot | @sportiki_danaga_test_bot | основной бот |
+| Таблица | dev spreadsheet | prod spreadsheet |
 
-- Бот: `@sportiki_danaga_test_bot`
-- GAS Bot: отдельный скрипт, тестовая таблица
-- GAS API: отдельный скрипт, та же тестовая таблица
-- Mini App: `http://localhost:5173` (Vite dev server)
-
-### Prod
-
-- Бот: основной бот
-- GAS Bot: продакшен скрипт, продакшен таблица
-- GAS API: продакшен скрипт, та же продакшен таблица
-- Mini App: `https://dmitry-kornienko.github.io/sportiki-merch`
+CI/CD — GitHub Actions: `main` → прод (бот + API + Mini App), `dev` → dev Mini App.
 
 ---
 
-## GIT FLOW
-
-```
-main          ← продакшен, защищённая ветка
-dev           ← интеграция и тестирование
-feature/*     ← разработка фич
-```
-
-### Рабочий процесс
+## КОМАНДЫ
 
 ```bash
-# Начало работы над фичей
-git checkout dev
-git checkout -b feature/events-screen
+npm run miniapp:dev          # Vite dev server
+npm run miniapp:build        # Сборка
 
-# Разработка + тест на dev окружении
-npm run gas:push:dev     # пушим бот/api в тестовый GAS
-npm run miniapp:dev      # запускаем фронт локально
+npm run api:deploy:dev       # Деплой API в dev GAS
+npm run api:deploy:prod      # Деплой API в prod GAS
 
-# Готово — мержим в dev
-git checkout dev
-git merge feature/events-screen
-git push origin dev
-# → GitHub Actions автоматически пушит в dev GAS
-
-# Выкатка в прод
-git checkout main
-git merge dev
-git push origin main
-# → GitHub Actions деплоит бота, API и Mini App
+npm run bot:deploy:dev       # Деплой бота в dev GAS
+npm run bot:deploy:prod      # Деплой бота в prod GAS
 ```
 
 ---
 
-## КОМАНДЫ (корневой package.json)
+## ПРИНЦИПЫ
 
-```bash
-# Mini App
-npm run miniapp:dev          # локальный дев сервер
-npm run miniapp:build        # сборка для прода
+**GAS:** Repository pattern, `db` как единая точка входа, `Database.js` одинаковый в боте и API, все тексты в `Texts.js`, клавиатуры в `Keyboards.js`, никакой бизнес-логики в роутере.
 
-# GAS Bot
-npm run bot:deploy:dev       # пуш + деплой в тестовый GAS
-npm run bot:deploy:prod      # пуш + деплой в продакшен GAS
+**React:** Функциональные компоненты + хуки, CSS Modules, никаких `any`, mobile-first.
 
-# GAS API
-npm run api:deploy:dev       # пуш + деплой в тестовый GAS
-npm run api:deploy:prod      # пуш + деплой в продакшен GAS
-```
+**Общее:** Именованные константы, секреты только в Script Properties / `.env`.
 
 ---
 
-## ПРИНЦИПЫ РАЗРАБОТКИ
+## НЕ РЕАЛИЗОВАНО
 
-### Общие
-
-- Один файл — одна ответственность
-- Именованные константы вместо магических чисел
-- Комментарии поясняют ПОЧЕМУ, не ЧТО
-- Никаких секретов в коде — только Script Properties и .env
-
-### GAS (бот + API)
-
-- **Repository pattern** — каждый лист Sheets имеет репозиторий
-- **Facade pattern** — объект `db` как единая точка входа
-- **SOLID** — каждый модуль делает одно
-- Никакой бизнес-логики в роутере — только диспетчеризация
-- Все тексты в `Texts.js`, все клавиатуры в `Keyboards.js`
-- `Database.js` одинаковый в боте и API (или вынести в shared)
-
-### React + TypeScript
-
-- Функциональные компоненты + хуки
-- Никаких `any` — типизировать всё
-- Кастомные хуки для логики (`useCart`, `useEvents`, `useTelegram`)
-- CSS Modules для изоляции стилей
-- Mobile-first (Mini App открывается только на телефоне)
-
----
-
-## ПОЭТАПНЫЙ ПЕРЕХОД БОТ → MINI APP
-
-```
-Этап 1 (текущий):
-  ✅ Бот — весь функционал
-  ✅ Mini App — только мерч
-
-Этап 2:
-  → GAS API: events, registrations endpoints
-  → Mini App: экран событий + запись
-
-Этап 3:
-  → GAS API: все endpoints
-  → Mini App: все экраны
-  → Бот: только /start + уведомления
-
-Этап 4 (финал):
-  → Бот упрощается до минимума
-  → Весь UI в Mini App
-  → GAS API — единственный бэкенд
-```
-
----
-
-## TODO
-
-- [ ] Настроить clasp для bot и api
-- [ ] Создать dev и prod GAS проекты для API
-- [ ] Инициализировать Vite + React + TS проект в miniapp/
-- [ ] Настроить GitHub Actions для автодеплоя
-- [ ] Реализовать GAS API: events endpoint
-- [ ] Реализовать экран событий в Mini App
-- [ ] Сканер QR — валидация через GAS API
-- [ ] QR-билеты — генерация при регистрации
-- [ ] Переименовать репозиторий sportiki-merch → sportiki
-- [ ] Добавить MERCH_MANAGER_ID в Script Properties (prod)
-
----
-
-## ССЫЛКИ
-
-|          | Dev                       | Prod                                      |
-| -------- | ------------------------- | ----------------------------------------- |
-| Бот      | @sportiki_danaga_test_bot | основной бот                              |
-| GAS Bot  | dev scriptId              | prod scriptId                             |
-| GAS API  | dev scriptId              | prod scriptId                             |
-| Mini App | localhost:5173            | dmitry-kornienko.github.io/sportiki-merch |
-| Таблица  | dev spreadsheet           | prod spreadsheet                          |
-| Канал    | —                         | t.me/INaumkin_coach                       |
+- QR-билеты: генерация токена при регистрации + `GET ?action=ticket` endpoint
+- Подтверждение оплаты (upload чека → статус Confirmed в Sheets)
+- Уведомления при открытии/закрытии записи и отмене события
+- Мерч через API (`POST ?action=order`) вместо `sendData`
