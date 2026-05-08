@@ -355,10 +355,10 @@ const RegRepository = {
 			) {
 				sheet.getRange(i + 1, COL.REGS.STATUS + 1).setValue(REG_STATUS.MAIN)
 				SheetCache.invalidate(SHEET_NAMES.REGS)
-				return true
+				return { chatId: row[COL.REGS.CHAT_ID].toString(), name: row[COL.REGS.NAME]?.toString() || '' }
 			}
 		}
-		return false
+		return null
 	},
 
 	// Переводит первые N участников из резерва в основной состав.

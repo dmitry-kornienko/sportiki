@@ -198,18 +198,14 @@ const EventsController = {
 	 */
 	_rebalance(eventId, eventType, eventTitle, eventDate, eventTime, newMaxPeople, newReserveLimit) {
 		const eventLine = (eventType ? eventType + ' ' : '') + eventTitle
+		const ctx = { eventLine, date: eventDate, time: eventTime }
 
 		if (newMaxPeople === 0) {
 			const regs = db.getRegsByEvent(eventId)
 			const reserveCount = regs.filter(r => r.status === REG_STATUS.RESERVE).length
 			if (reserveCount === 0) return
-			const msgPromoted =
-				`🎉 Отличные новости!\n\n` +
-				`Вы в основном составе на событие:\n${eventLine}\n\n` +
-				`📅 ${eventDate}\n🕐 ${eventTime}\n\n` +
-				`До встречи на старте 🙌`
 			const promoted = db.promoteFirstN(eventId, reserveCount)
-			promoted.forEach(r => sendTelegramMessage(r.chatId, msgPromoted))
+			promoted.forEach(r => sendTelegramMessage(r.chatId, Texts.rebalancePromoted(ctx)))
 			return
 		}
 
@@ -217,51 +213,35 @@ const EventsController = {
 		const mainCount = regs.filter(r => r.status === REG_STATUS.MAIN).length
 		const reserveCount = regs.filter(r => r.status === REG_STATUS.RESERVE).length
 
-		const msgPromoted =
-			`🎉 Отличные новости!\n\n` +
-			`Вы в основном составе на событие:\n${eventLine}\n\n` +
-			`📅 ${eventDate}\n🕐 ${eventTime}\n\n` +
-			`До встречи на старте 🙌`
-		const msgDemoted =
-			`ℹ️ Обновление по вашей записи:\n\n` +
-			`Из-за изменения лимита участников вы были переведены в резерв на событие:\n${eventLine}\n\n` +
-			`📅 ${eventDate}\n🕐 ${eventTime}\n\n` +
-			`Если место освободится — вы автоматически попадёте в основной состав 👍`
-		const msgDeleted =
-			`😔 К сожалению, организатор уменьшил лимит участников, поэтому ваша запись была отменена.\n\n` +
-			`Событие:\n${eventLine}\n\n` +
-			`📅 ${eventDate}\n🕐 ${eventTime}\n\n` +
-			`Вы можете записаться снова, если появятся свободные места.`
-
 		const notifications = []
 
 		if (newMaxPeople > mainCount) {
 			const toPromote = Math.min(reserveCount, newMaxPeople - mainCount)
 			if (toPromote > 0) {
 				const promoted = db.promoteFirstN(eventId, toPromote)
-				promoted.forEach(r => notifications.push({ chatId: r.chatId, text: msgPromoted }))
+				promoted.forEach(r => notifications.push({ chatId: r.chatId, text: Texts.rebalancePromoted(ctx) }))
 			}
 			const reserveAfter = reserveCount - toPromote
 			if (reserveAfter > newReserveLimit) {
 				const toDelete = reserveAfter - newReserveLimit
 				const deleted = db.deleteLastReserve(eventId, toDelete)
-				deleted.forEach(r => notifications.push({ chatId: r.chatId, text: msgDeleted }))
+				deleted.forEach(r => notifications.push({ chatId: r.chatId, text: Texts.rebalanceDeleted(ctx) }))
 			}
 		} else if (newMaxPeople < mainCount) {
 			const toDemote = mainCount - newMaxPeople
 			const demoted = db.demoteLastMain(eventId, toDemote)
-			demoted.forEach(r => notifications.push({ chatId: r.chatId, text: msgDemoted }))
+			demoted.forEach(r => notifications.push({ chatId: r.chatId, text: Texts.rebalanceDemoted(ctx) }))
 			const reserveAfter = reserveCount + toDemote
 			if (reserveAfter > newReserveLimit) {
 				const toDelete = reserveAfter - newReserveLimit
 				const deleted = db.deleteLastReserve(eventId, toDelete)
-				deleted.forEach(r => notifications.push({ chatId: r.chatId, text: msgDeleted }))
+				deleted.forEach(r => notifications.push({ chatId: r.chatId, text: Texts.rebalanceDeleted(ctx) }))
 			}
 		} else {
 			if (reserveCount > newReserveLimit) {
 				const toDelete = reserveCount - newReserveLimit
 				const deleted = db.deleteLastReserve(eventId, toDelete)
-				deleted.forEach(r => notifications.push({ chatId: r.chatId, text: msgDeleted }))
+				deleted.forEach(r => notifications.push({ chatId: r.chatId, text: Texts.rebalanceDeleted(ctx) }))
 			}
 		}
 

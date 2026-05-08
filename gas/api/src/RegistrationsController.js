@@ -3,6 +3,11 @@
 // Назначение: Обработка запросов регистрации на события.
 // ============================================================
 
+function _sendPromotedNotification(chatId, event) {
+	const eventLine = (event.type ? event.type + ' ' : '') + event.title
+	sendTelegramMessage(chatId, Texts.promoted({ eventLine, date: event.date, time: event.time }))
+}
+
 const RegistrationsController = {
 	/**
 	 * GET ?action=registrations
@@ -169,7 +174,11 @@ const RegistrationsController = {
 			db.deleteGuestReg(chatId, eventId)
 
 			if (wasMain) {
-				db.promoteFirstReserve(eventId)
+				const event = db.getEventById(eventId)
+				const promoted = db.promoteFirstReserve(eventId)
+				if (promoted && event) {
+					_sendPromotedNotification(promoted.chatId, event)
+				}
 			}
 
 			return Response.ok({ removed: true })
@@ -207,7 +216,11 @@ const RegistrationsController = {
 			db.deleteReg(chatId, eventId)
 
 			if (wasMain) {
-				db.promoteFirstReserve(eventId)
+				const event = db.getEventById(eventId)
+				const promoted = db.promoteFirstReserve(eventId)
+				if (promoted && event) {
+					_sendPromotedNotification(promoted.chatId, event)
+				}
 			}
 
 			return Response.ok({ unregistered: true })
