@@ -5,11 +5,10 @@
   "scripts": {
     "push:dev":    "node -e \"require('fs').copyFileSync('.clasp.dev.json','.clasp.json')\" && clasp push",
     "push:prod":   "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && clasp push",
-    "deploy:dev":  "node -e \"require('fs').copyFileSync('.clasp.dev.json','.clasp.json')\" && clasp push --force && node redeploy.js",
+    "deploy:dev":  "node -e \"require('fs').copyFileSync('.clasp.dev.json','.clasp.json')\" && clasp push --force && node redeploy.js AKfycbxFSH-okbj-P6E_P7ZQ6tPnPzZWYmULslEk8thrN6Le-g8Y5jNsn9MKgli1llQw34ykTQ",
     "deploy:prod": "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && clasp push --force && node redeploy.js",
-    "deploy":      "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && clasp push && clasp deploy",
-    "open:dev":   "node -e \"require('fs').copyFileSync('.clasp.dev.json','.clasp.json')\" && clasp open",
-    "open:prod":  "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && clasp open",
-    "logs":       "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && clasp logs"
+    "open:dev":    "node -e \"require('fs').copyFileSync('.clasp.dev.json','.clasp.json')\" && clasp open",
+    "open:prod":   "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && clasp open",
+    "logs":        "node -e \"require('fs').copyFileSync('.clasp.prod.json','.clasp.json')\" && clasp logs"
   }
 }

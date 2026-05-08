@@ -7,31 +7,21 @@ const Keyboards = {
 	mainMenu(events, chatId) {
 		const buttons = [[{ text: Texts.buttons.goToChannel, url: CHANNEL_URL }]]
 
-		events.forEach(ev => {
-			const isClosed = ev.status === STATUSES.CLOSED
-			const label = isClosed
-				? `${ev.date} — ${ev.title} (Full)`
-				: `${ev.date} — ${ev.title}`
-			buttons.push([{ text: label, callback_data: `event_info_${ev.id}` }])
-		})
+		// events.forEach(ev => {
+		// 	const isClosed = ev.status === STATUSES.CLOSED
+		// 	const label = isClosed
+		// 		? `${ev.date} — ${ev.title} (Full)`
+		// 		: `${ev.date} — ${ev.title}`
+		// 	buttons.push([{ text: label, callback_data: `event_info_${ev.id}` }])
+		// })
 
-		buttons.push([{ text: Texts.buttons.myRegs, callback_data: 'my_regs' }])
-		buttons.push([{ text: '🏃 Открыть Sportiki', web_app: { url: MINI_APP_URL } }])
+		// buttons.push([{ text: Texts.buttons.myRegs, callback_data: 'my_regs' }])
+		buttons.push([{ text: Texts.buttons.openApp, web_app: { url: MINI_APP_URL } }])
 
-		if (isAdmin(chatId)) {
-			buttons.push([
-				{
-					text: Texts.buttons.adminCreate,
-					callback_data: 'admin_create_event',
-				},
-			])
-			buttons.push([
-				{
-					text: Texts.buttons.adminBroadcast,
-					callback_data: 'admin_broadcast',
-				},
-			])
-		}
+		// if (isAdmin(chatId)) {
+		// 	buttons.push([{ text: Texts.buttons.adminCreate, callback_data: 'admin_create_event' }])
+		// 	buttons.push([{ text: Texts.buttons.adminBroadcast, callback_data: 'admin_broadcast' }])
+		// }
 
 		return { inline_keyboard: buttons }
 	},

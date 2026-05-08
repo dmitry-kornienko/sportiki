@@ -43,7 +43,7 @@ function setMenuButton() {
 			payload: JSON.stringify({
 				menu_button: {
 					type: 'web_app',
-					text: 'Открыть Sportiki',
+					text: 'Открыть приложение',
 					web_app: { url },
 				},
 			}),

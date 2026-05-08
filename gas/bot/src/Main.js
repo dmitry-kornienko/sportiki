@@ -608,38 +608,28 @@ const Sender = {
 	mainMenu(chatId, messageId = null) {
 		const events = db.getActiveEvents()
 
-		if (events.length === 0) {
-			const kb = isAdmin(chatId)
-				? {
-						inline_keyboard: [
-							[
-								{
-									text: Texts.buttons.adminCreate,
-									callback_data: 'admin_create_event',
-								},
-							],
-						],
-					}
-				: null
-			TelegramApi.sendMessage(chatId, Texts.noEvents, kb)
-			return
-		}
+		// if (events.length === 0) {
+		// 	const kb = isAdmin(chatId)
+		// 		? { inline_keyboard: [[{ text: Texts.buttons.adminCreate, callback_data: 'admin_create_event' }]] }
+		// 		: null
+		// 	TelegramApi.sendMessage(chatId, Texts.noEvents, kb)
+		// 	return
+		// }
 
-		let text = Texts.welcome + '\n\n'
-		events.forEach((ev, i) => {
-			const dayName = getRussianDayOfWeek(ev.date)
-			const closed = ev.status === STATUSES.CLOSED ? ' 🚫' : ''
-			text += `${i + 1}. ${ev.type} *${escapeMarkdown(ev.title)}*${closed}\n`
-			text += `🗓 ${ev.date} (${dayName}) | ⏰ ${ev.time}\n\n`
-		})
+		// let text = Texts.welcome + '\n\n'
+		// events.forEach((ev, i) => {
+		// 	const dayName = getRussianDayOfWeek(ev.date)
+		// 	const closed = ev.status === STATUSES.CLOSED ? ' 🚫' : ''
+		// 	text += `${i + 1}. ${ev.type} *${escapeMarkdown(ev.title)}*${closed}\n`
+		// 	text += `🗓 ${ev.date} (${dayName}) | ⏰ ${ev.time}\n\n`
+		// })
+		// const fullText = text + Texts.chooseEvent
 
 		const keyboard = Keyboards.mainMenu(events, chatId)
-		const fullText = text + Texts.chooseEvent
-
 		if (messageId) {
-			TelegramApi.editMessage(chatId, messageId, fullText, keyboard)
+			TelegramApi.editMessage(chatId, messageId, Texts.welcome, keyboard)
 		} else {
-			TelegramApi.sendMessage(chatId, fullText, keyboard)
+			TelegramApi.sendMessage(chatId, Texts.welcome, keyboard)
 		}
 	},
 

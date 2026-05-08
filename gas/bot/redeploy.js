@@ -8,7 +8,7 @@ const { execSync } = require('child_process')
 let id = process.argv[2]
 
 if (!id) {
-	const output = execSync('npx clasp deployments').toString()
+	const output = execSync('clasp deployments').toString()
 	const existing = output
 		.split('\n')
 		.map(l => l.trim())
@@ -16,7 +16,7 @@ if (!id) {
 
 	if (!existing.length) {
 		console.log('Деплоймент не найден — создаём первый...')
-		execSync('npx clasp deploy', { stdio: 'inherit' })
+		execSync('clasp deploy', { stdio: 'inherit' })
 		process.exit(0)
 	}
 
@@ -29,4 +29,4 @@ if (!id) {
 }
 
 console.log(`Обновляем деплоймент ${id}...`)
-execSync(`npx clasp deploy -i ${id}`, { stdio: 'inherit' })
+execSync(`clasp deploy -i ${id}`, { stdio: 'inherit' })
