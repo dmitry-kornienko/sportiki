@@ -202,6 +202,11 @@
 	cursor: default;
 }
 
+.submitBtn :global(.dots span),
+.confirmOk :global(.dots span) {
+	background: var(--white);
+}
+
 /* Confirmation sheet */
 
 .confirmBackdrop {

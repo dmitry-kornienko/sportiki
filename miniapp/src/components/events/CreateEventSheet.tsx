@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { createEvent, updateEvent } from '../../api/events'
 import type { Event, Participant } from '../../types'
 import { fmt } from '../../utils/format'
+import { Loader } from '../ui/Loader'
 import s from './CreateEventSheet.module.css'
 
 interface Props {
@@ -449,9 +450,7 @@ export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, o
 					/>
 				</div>
 				<button className={s.submitBtn} type='submit' disabled={loading}>
-					{loading
-					? (isEdit ? 'Сохраняем...' : 'Создаём...')
-					: (isEdit ? 'Сохранить изменения' : 'Создать событие')}
+					{loading ? <Loader /> : (isEdit ? 'Сохранить изменения' : 'Создать событие')}
 				</button>
 			</form>
 
@@ -502,7 +501,7 @@ export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, o
 								Отмена
 							</button>
 							<button className={s.confirmOk} onClick={handleConfirm} type='button' disabled={loading}>
-								{loading ? 'Сохраняем...' : 'Сохранить и уведомить'}
+								{loading ? <Loader /> : 'Сохранить и уведомить'}
 							</button>
 						</div>
 					</div>
