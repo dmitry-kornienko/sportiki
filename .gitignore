@@ -7,7 +7,9 @@ miniapp/dist/
 
 # Environment variables
 .env
+.env.local
 miniapp/.env
+miniapp/.env.local
 
 # Clasp active config (generated from .clasp.dev.json / .clasp.prod.json)
 gas/api/.clasp.json
