@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Product } from '../../types'
-import { fmt } from '../../utils/format'
+import { formatPrice } from '../../utils/format'
 import s from './ProductCard.module.css'
 
 interface Props {
@@ -30,7 +30,7 @@ export function ProductCard({ product, onClick }: Props) {
 						<div key={c.name} className={s.dot} style={{ background: c.hex }} />
 					))}
 				</div>
-				<div className={s.price}>{fmt(product.price)}</div>
+				<div className={s.price}>{formatPrice(product.price)}</div>
 			</div>
 		</div>
 	)

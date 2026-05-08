@@ -2,6 +2,17 @@ import { getInitData, getTelegramUserId } from '../utils/telegram'
 
 const API_URL = import.meta.env.VITE_API_URL as string
 
+async function parseResponse<T>(res: Response): Promise<T> {
+	let data: { ok: boolean; data?: T; error?: string }
+	try {
+		data = await res.json()
+	} catch {
+		throw new Error(`Ошибка сервера (${res.status})`)
+	}
+	if (!data.ok) throw new Error(data.error ?? 'Неизвестная ошибка')
+	return data.data as T
+}
+
 export async function get<T>(params: Record<string, string>): Promise<T> {
 	const url = new URL(API_URL)
 	const initData = getInitData()
@@ -11,9 +22,7 @@ export async function get<T>(params: Record<string, string>): Promise<T> {
 	else url.searchParams.set('userId', getTelegramUserId())
 
 	const res = await fetch(url.toString())
-	const data = await res.json()
-	if (!data.ok) throw new Error(data.error)
-	return data.data as T
+	return parseResponse<T>(res)
 }
 
 export async function post<T>(body: Record<string, unknown>): Promise<T> {
@@ -26,7 +35,5 @@ export async function post<T>(body: Record<string, unknown>): Promise<T> {
 		method: 'POST',
 		body: JSON.stringify(payload),
 	})
-	const data = await res.json()
-	if (!data.ok) throw new Error(data.error)
-	return data.data as T
+	return parseResponse<T>(res)
 }

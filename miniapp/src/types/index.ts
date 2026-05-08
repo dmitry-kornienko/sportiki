@@ -30,6 +30,14 @@ export interface Participant {
 	confirmed: boolean
 }
 
+export const EVENT_STATUS = {
+	OPEN: 'Registration_Open',
+	CLOSED: 'Registration_Closed',
+	ARCHIVED: 'Archived',
+} as const
+
+export type EventStatus = (typeof EVENT_STATUS)[keyof typeof EVENT_STATUS]
+
 export interface Event {
 	id: string
 	type: string
@@ -41,7 +49,7 @@ export interface Event {
 	price: number
 	paymentInfo: string
 	info: string
-	status: string
+	status: EventStatus
 	location: string
 	mainCount: number
 	totalCount: number
@@ -64,7 +72,7 @@ export interface Registration {
 		title: string
 		date: string
 		time: string
-		status: string
+		status: EventStatus
 	}
 }
 

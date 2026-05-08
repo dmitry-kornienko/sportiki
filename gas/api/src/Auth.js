@@ -80,6 +80,8 @@ const Auth = {
 	 * @returns {{ id: string, username: string, first_name: string }}
 	 */
 	devUser(chatId) {
+		const isDev = PropertiesService.getScriptProperties().getProperty('DEV_MODE') === 'true'
+		if (!isDev) return null
 		return {
 			id: chatId || 'dev_user',
 			username: 'dev',

@@ -7,11 +7,7 @@ import { ProductDetail } from '../components/merch/ProductDetail'
 import { Cart } from '../components/merch/Cart'
 import s from './MerchScreen.module.css'
 
-interface Props {
-	onToast: (msg: string) => void
-}
-
-export function MerchScreen({ onToast }: Props) {
+export function MerchScreen() {
 	const [tab, setTab] = useState<MerchTab>('catalog')
 	const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 	const { cart, total, addItem, removeItem, clear, isInCart } = useCart()
@@ -51,11 +47,8 @@ export function MerchScreen({ onToast }: Props) {
 				<ProductDetail
 					product={selectedProduct}
 					isInCart={isInCart}
-					onAdd={(product, color) => {
-						addItem(product, color)
-					}}
+					onAdd={(product, color) => { addItem(product, color) }}
 					onClose={() => setSelectedProduct(null)}
-					onToast={onToast}
 				/>
 			)}
 		</div>

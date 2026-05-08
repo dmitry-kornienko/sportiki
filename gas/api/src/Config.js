@@ -28,7 +28,7 @@ const REG_STATUS = Object.freeze({
 })
 
 // Лимит резерва по умолчанию — используется если в строке Events не задан ReserveLimit
-const DEFAULT_RESERVE_LIMIT = 20
+const DEFAULT_RESERVE_LIMIT = 3
 
 // Лимиты
 const LIMITS = Object.freeze({

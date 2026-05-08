@@ -1,3 +1,3 @@
-export function fmt(price: number): string {
+export function formatPrice(price: number): string {
 	return price.toLocaleString('ru-RU') + ' ₫'
 }

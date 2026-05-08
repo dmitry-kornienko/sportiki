@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { Product, ProductColor } from '../../types'
-import { fmt } from '../../utils/format'
+import { formatPrice } from '../../utils/format'
+import { useToastAction } from '../../context/ToastContext'
 import s from './ProductDetail.module.css'
 
 interface Props {
@@ -8,10 +9,10 @@ interface Props {
 	isInCart: (productId: string, colorName: string) => boolean
 	onAdd: (product: Product, color: ProductColor) => void
 	onClose: () => void
-	onToast: (msg: string) => void
 }
 
-export function ProductDetail({ product, isInCart, onAdd, onClose, onToast }: Props) {
+export function ProductDetail({ product, isInCart, onAdd, onClose }: Props) {
+	const toast = useToastAction()
 	const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
 	const [imgSrc, setImgSrc] = useState('')
 	const [imgError, setImgError] = useState(false)
@@ -38,16 +39,16 @@ export function ProductDetail({ product, isInCart, onAdd, onClose, onToast }: Pr
 	function handleAdd() {
 		if (!selectedColor) return
 		if (inCart) {
-			onToast('Уже в корзине!')
+			toast('Уже в корзине!')
 			return
 		}
 		onAdd(product!, selectedColor)
-		onToast(`${product!.name} (${selectedColor.name}) добавлен!`)
+		toast(`${product!.name} (${selectedColor.name}) добавлен!`)
 	}
 
 	let btnText = 'Выбери цвет'
 	if (selectedColor) {
-		btnText = inCart ? '✓ В корзине' : `Добавить — ${fmt(product.price)}`
+		btnText = inCart ? '✓ В корзине' : `Добавить — ${formatPrice(product.price)}`
 	}
 
 	return (
@@ -70,7 +71,7 @@ export function ProductDetail({ product, isInCart, onAdd, onClose, onToast }: Pr
 
 			<div className={s.body}>
 				<div className={s.name}>{product.name}</div>
-				<div className={s.price}>{fmt(product.price)}</div>
+				<div className={s.price}>{formatPrice(product.price)}</div>
 				<div className={s.desc}>{product.description}</div>
 
 				<div className={s.sectionLabel}>Выбери цвет</div>

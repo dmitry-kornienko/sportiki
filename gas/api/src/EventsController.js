@@ -169,6 +169,7 @@ const EventsController = {
 		if (maxPeopleNum < 0) return Response.error('maxPeople не может быть отрицательным')
 
 		const reserveLimitNum = maxPeopleNum > 0 ? (parseInt(reserveLimit) || DEFAULT_RESERVE_LIMIT) : 0
+		if (reserveLimitNum < 0) return Response.error('reserveLimit не может быть отрицательным')
 
 		const found = db.updateEvent(id.toString(), {
 			type: type.trim(),

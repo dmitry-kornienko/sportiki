@@ -1,5 +1,5 @@
 import { get, post } from './client'
-import type { Event } from '../types'
+import type { Event, EventStatus } from '../types'
 
 export interface CreateEventPayload {
 	type: string
@@ -24,7 +24,7 @@ export function fetchEvent(id: string): Promise<Event> {
 
 export interface UpdateEventPayload extends CreateEventPayload {
 	id: string
-	status: string
+	status: EventStatus
 }
 
 export function createEvent(payload: CreateEventPayload): Promise<{ id: string }> {

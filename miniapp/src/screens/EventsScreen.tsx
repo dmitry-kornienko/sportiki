@@ -8,11 +8,7 @@ import type { Event, Registration } from '../types'
 import { getTelegramUserId, isAdmin } from '../utils/telegram'
 import s from './EventsScreen.module.css'
 
-interface Props {
-	onToast: (msg: string) => void
-}
-
-export function EventsScreen({ onToast }: Props) {
+export function EventsScreen() {
 	const { events, loading, error, isRegistered, getRegStatus, getGuestReg, addEvent, addRegistration, removeRegistration, removeGuestRegistration, updateEvent } = useEvents()
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
 	const [showCreate, setShowCreate] = useState(false)
@@ -40,10 +36,9 @@ export function EventsScreen({ onToast }: Props) {
 				guestReg={getGuestReg(selectedEvent.id)}
 				onRegister={handleRegister}
 				onUnregister={removeRegistration}
-				onGuestRegister={(reg) => addRegistration(reg)}
-				onGuestUnregister={(eventId) => removeGuestRegistration(eventId)}
+				onGuestRegister={reg => addRegistration(reg)}
+				onGuestUnregister={eventId => removeGuestRegistration(eventId)}
 				onEventUpdate={updateEvent}
-				onToast={onToast}
 				onBack={() => setSelectedEvent(null)}
 			/>
 		)
@@ -73,7 +68,6 @@ export function EventsScreen({ onToast }: Props) {
 					open={showCreate}
 					onCreated={addEvent}
 					onClose={() => setShowCreate(false)}
-					onToast={onToast}
 				/>
 			)}
 		</>

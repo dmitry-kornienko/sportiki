@@ -16,7 +16,7 @@ const COL = Object.freeze({
 		INFO: 6,
 		STATUS: 7,
 		LOCATION: 8,
-		REMINDER_SENT: 9,
+		// col 9: REMINDER_SENT — бот-only, API не читает
 		RESERVE_LIMIT: 10,
 		PRICE: 11,
 		PAYMENT_INFO: 12,
@@ -127,8 +127,8 @@ const EventRepository = {
 			location: row[COL.EVENTS.LOCATION]
 				? row[COL.EVENTS.LOCATION].toString()
 				: '',
-			reserveLimit: row[COL.EVENTS.RESERVE_LIMIT]
-				? parseInt(row[COL.EVENTS.RESERVE_LIMIT])
+			reserveLimit: row[COL.EVENTS.RESERVE_LIMIT] !== ''
+				? parseInt(row[COL.EVENTS.RESERVE_LIMIT]) || 0
 				: DEFAULT_RESERVE_LIMIT,
 			price: row[COL.EVENTS.PRICE] ? Number(row[COL.EVENTS.PRICE]) : 0,
 			paymentInfo: row[COL.EVENTS.PAYMENT_INFO] ? row[COL.EVENTS.PAYMENT_INFO].toString() : '',
@@ -164,7 +164,7 @@ const EventRepository = {
 
 	create(eventData) {
 		const sheet = SheetCache.sheet(SHEET_NAMES.EVENTS)
-		const id = Date.now().toString().slice(-6)
+		const id = Date.now().toString()
 		const reserveLimit = parseInt(eventData.maxPeople) > 0
 			? (parseInt(eventData.reserveLimit) || DEFAULT_RESERVE_LIMIT)
 			: 0

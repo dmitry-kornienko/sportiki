@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { createEvent, updateEvent } from '../../api/events'
-import type { Event, Participant } from '../../types'
-import { fmt } from '../../utils/format'
+import { EVENT_STATUS, type EventStatus, type Event, type Participant } from '../../types'
+import { formatPrice } from '../../utils/format'
+import { useToastAction } from '../../context/ToastContext'
 import { Loader } from '../ui/Loader'
 import s from './CreateEventSheet.module.css'
 
@@ -12,7 +13,6 @@ interface Props {
 	onCreated?: (event: Event) => void
 	onUpdated?: (event: Event) => void
 	onClose: () => void
-	onToast: (msg: string) => void
 }
 
 const DEFAULT_RESERVE_LIMIT = 3
@@ -113,7 +113,11 @@ interface ImpactData {
 }
 
 function calcImpact(event: Event, newMaxPeople: number, newReserveLimit: number): ImpactData | null {
-	if (newMaxPeople === 0) return null
+	if (newMaxPeople === 0) {
+		const reserveList = event.reserveParticipants ?? []
+		if (reserveList.length === 0) return null
+		return { promotedNames: reserveList.map(p => p.name), demotedNames: [], deletedNames: [] }
+	}
 
 	const mainCount = event.mainCount
 	const mainList: Participant[] = event.participants || []
@@ -167,14 +171,15 @@ type Payload = {
 	type: string; title: string; date: string; time: string
 	maxPeople: number; reserveLimit: number; price: number
 	paymentInfo: string; info: string; location: string
-	status?: string
+	status?: EventStatus
 }
 
-export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, onToast }: Props) {
+export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose }: Props) {
+	const onToast = useToastAction()
 	const isEdit = !!event
 	const [form, setForm] = useState(() => event ? eventToForm(event) : EMPTY_FORM)
 	const [pay, setPay] = useState<PayMethods>(() => event ? parsePay(event.paymentInfo) : EMPTY_PAY)
-	const [status, setStatus] = useState(() => event?.status || 'Registration_Open')
+	const [status, setStatus] = useState<EventStatus>(() => event?.status ?? EVENT_STATUS.OPEN)
 	const [loading, setLoading] = useState(false)
 	const [visible, setVisible] = useState(false)
 	const [showConfirm, setShowConfirm] = useState(false)
@@ -201,7 +206,7 @@ export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, o
 	function handleClose() {
 		setForm(isEdit ? eventToForm(event!) : EMPTY_FORM)
 		setPay(isEdit ? parsePay(event!.paymentInfo) : EMPTY_PAY)
-		setStatus(event?.status || 'Registration_Open')
+		setStatus(event?.status ?? EVENT_STATUS.OPEN)
 		onClose()
 	}
 
@@ -390,7 +395,7 @@ export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, o
 						value={form.price}
 						onChange={e => setField('price', e.target.value)}
 					/>
-					{price > 0 && <div className={s.pricePreview}>{fmt(price)}</div>}
+					{price > 0 && <div className={s.pricePreview}>{formatPrice(price)}</div>}
 				</div>
 
 				{price > 0 && (
@@ -466,7 +471,7 @@ export function CreateEventSheet({ open, event, onCreated, onUpdated, onClose, o
 						<select
 							className={s.input}
 							value={status}
-							onChange={e => setStatus(e.target.value)}
+							onChange={e => setStatus(e.target.value as EventStatus)}
 						>
 							{EVENT_STATUSES.map(opt => (
 								<option key={opt.value} value={opt.value}>{opt.label}</option>

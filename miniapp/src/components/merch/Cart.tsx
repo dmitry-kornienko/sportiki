@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { CartItem } from '../../types'
-import { fmt } from '../../utils/format'
+import { formatPrice } from '../../utils/format'
 import { EmptyState } from '../ui/EmptyState'
 import s from './Cart.module.css'
 
@@ -53,7 +53,7 @@ export function Cart({ cart, total, onRemove, onClear }: Props) {
 			<div className={s.footer}>
 				<div className={s.total}>
 					<div className={s.totalLabel}>Итого</div>
-					<div className={s.totalPrice}>{fmt(total)}</div>
+					<div className={s.totalPrice}>{formatPrice(total)}</div>
 				</div>
 				<div className={s.note}>
 					После оформления заявки наш менеджер свяжется с тобой для уточнения деталей.
@@ -87,7 +87,7 @@ function CartItemRow({ item, onRemove }: { item: CartItem; onRemove: () => void 
 					<span className={s.colorDot} style={{ background: item.colorHex }} />
 					{item.color}
 				</div>
-				<div className={s.itemPrice}>{fmt(item.price)}</div>
+				<div className={s.itemPrice}>{formatPrice(item.price)}</div>
 			</div>
 			<button className={s.removeBtn} onClick={onRemove}>✕</button>
 		</div>

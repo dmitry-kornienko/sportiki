@@ -1,8 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { CartItem, Product, ProductColor } from '../types'
 
+const CART_KEY = 'sportiki_cart'
+
+function loadCart(): CartItem[] {
+	try {
+		const stored = localStorage.getItem(CART_KEY)
+		return stored ? (JSON.parse(stored) as CartItem[]) : []
+	} catch {
+		return []
+	}
+}
+
 export function useCart() {
-	const [cart, setCart] = useState<CartItem[]>([])
+	const [cart, setCart] = useState<CartItem[]>(loadCart)
+
+	useEffect(() => {
+		localStorage.setItem(CART_KEY, JSON.stringify(cart))
+	}, [cart])
 
 	function addItem(product: Product, color: ProductColor) {
 		const exists = cart.find(i => i.productId === product.id && i.color === color.name)
