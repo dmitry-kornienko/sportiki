@@ -196,13 +196,26 @@ const EventsController = {
 	 * Уведомляет затронутых участников через Telegram.
 	 */
 	_rebalance(eventId, eventType, eventTitle, eventDate, eventTime, newMaxPeople, newReserveLimit) {
-		if (newMaxPeople === 0) return
+		const eventLine = (eventType ? eventType + ' ' : '') + eventTitle
+
+		if (newMaxPeople === 0) {
+			const regs = db.getRegsByEvent(eventId)
+			const reserveCount = regs.filter(r => r.status === REG_STATUS.RESERVE).length
+			if (reserveCount === 0) return
+			const msgPromoted =
+				`🎉 Отличные новости!\n\n` +
+				`Вы в основном составе на событие:\n${eventLine}\n\n` +
+				`📅 ${eventDate}\n🕐 ${eventTime}\n\n` +
+				`До встречи на старте 🙌`
+			const promoted = db.promoteFirstN(eventId, reserveCount)
+			promoted.forEach(r => sendTelegramMessage(r.chatId, msgPromoted))
+			return
+		}
 
 		const regs = db.getRegsByEvent(eventId)
 		const mainCount = regs.filter(r => r.status === REG_STATUS.MAIN).length
 		const reserveCount = regs.filter(r => r.status === REG_STATUS.RESERVE).length
 
-		const eventLine = (eventType ? eventType + ' ' : '') + eventTitle
 		const msgPromoted =
 			`🎉 Отличные новости!\n\n` +
 			`Вы в основном составе на событие:\n${eventLine}\n\n` +
