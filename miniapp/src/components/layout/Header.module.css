@@ -26,3 +26,122 @@
 	color: var(--gray);
 	margin-bottom: 1px;
 }
+
+/* City selector */
+
+.cityWrap {
+	position: relative;
+}
+
+.cityFlag {
+	font-size: 13px;
+	line-height: 1;
+	position: relative;
+	top: 1px;
+}
+
+.cityBtn {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	background: var(--light);
+	border: 1.5px solid var(--border);
+	border-radius: 20px;
+	padding: 5px 10px;
+	font-size: 13px;
+	line-height: 1;
+	font-weight: 600;
+	color: var(--text);
+	cursor: pointer;
+	transition: background 0.15s;
+}
+
+.cityBtn:active {
+	background: var(--border);
+}
+
+.chevron {
+	font-size: 11px;
+	color: var(--gray);
+	transition: transform 0.2s;
+	display: inline-block;
+}
+
+.chevronOpen {
+	transform: rotate(180deg);
+}
+
+.backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 99;
+}
+
+.dropdown {
+	position: absolute;
+	top: calc(100% + 8px);
+	right: 0;
+	z-index: 100;
+	background: var(--white);
+	border: 1.5px solid var(--border);
+	border-radius: 14px;
+	overflow: hidden;
+	min-width: 160px;
+	box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.option {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 12px;
+}
+
+.option + .option {
+	border-top: 1px solid var(--border);
+}
+
+.optionActive {
+	cursor: pointer;
+}
+
+.optionActive:active {
+	background: var(--light);
+}
+
+.optionDisabled {
+	opacity: 0.5;
+	cursor: default;
+}
+
+.optionFlag {
+	font-size: 18px;
+	line-height: 1;
+	flex-shrink: 0;
+}
+
+.optionInfo {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	flex: 1;
+}
+
+.optionName {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--text);
+}
+
+.optionSoon {
+	font-size: 10px;
+	color: var(--gray);
+	letter-spacing: 0.02em;
+}
+
+.optionCheck {
+	font-size: 13px;
+	color: var(--accent);
+	font-weight: 800;
+	flex-shrink: 0;
+}
