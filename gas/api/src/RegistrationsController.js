@@ -188,6 +188,25 @@ const RegistrationsController = {
 	},
 
 	/**
+	 * POST action=confirm_attendance
+	 * Body: { eventId }
+	 * Подтверждает участие — ставит CONFIRMATION=Confirmed.
+	 */
+	confirmAttendance(body, user) {
+		const eventId = body.eventId
+		if (!eventId) return Response.error('Не указан eventId')
+
+		const chatId = user.id.toString()
+		db.clearCache()
+
+		const existing = db.findRegByUserAndEvent(chatId, eventId)
+		if (!existing) return Response.error('Регистрация не найдена', 404)
+
+		db.setConfirmation(chatId, eventId, 'Confirmed')
+		return Response.ok({ confirmed: true })
+	},
+
+	/**
 	 * POST action=unregister
 	 * Body: { eventId }
 	 * Отменяет регистрацию пользователя и продвигает первого из резерва.

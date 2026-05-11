@@ -31,6 +31,16 @@ export function useEvents() {
 		return registrations.find(r => r.eventId === eventId && r.isGuest) ?? null
 	}
 
+	function getConfirmation(eventId: string): string | null {
+		return registrations.find(r => r.eventId === eventId && !r.isGuest)?.confirmation ?? null
+	}
+
+	function setConfirmationLocal(eventId: string) {
+		setRegistrations(prev => prev.map(r =>
+			r.eventId === eventId && !r.isGuest ? { ...r, confirmation: 'Confirmed' } : r
+		))
+	}
+
 	function addEvent(event: Event) {
 		setEvents(prev => [...prev, event])
 	}
@@ -67,6 +77,8 @@ export function useEvents() {
 		isRegistered,
 		getRegStatus,
 		getGuestReg,
+		getConfirmation,
+		setConfirmationLocal,
 		addEvent,
 		updateEvent,
 		addRegistration,

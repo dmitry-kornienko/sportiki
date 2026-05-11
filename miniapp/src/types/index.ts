@@ -66,6 +66,7 @@ export interface Registration {
 	username: string
 	status: 'MAIN' | 'RESERVE'
 	isGuest: boolean
+	confirmation?: string
 	event?: {
 		id: string
 		type: string

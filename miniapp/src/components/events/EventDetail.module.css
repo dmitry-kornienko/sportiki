@@ -653,6 +653,13 @@
 	color: var(--warning-text);
 }
 
+.btnConfirm {
+	background: #34c759;
+	color: #fff;
+	width: 100%;
+	margin-bottom: 8px;
+}
+
 .btnFull {
 	background: var(--border);
 	color: var(--gray);

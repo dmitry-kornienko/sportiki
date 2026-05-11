@@ -20,3 +20,7 @@ export function registerGuest(eventId: string, guestName: string): Promise<{ sta
 export function unregisterGuest(eventId: string): Promise<{ removed: boolean }> {
 	return post({ action: 'unregister_guest', eventId })
 }
+
+export function confirmAttendance(eventId: string): Promise<{ confirmed: boolean }> {
+	return post({ action: 'confirm_attendance', eventId })
+}

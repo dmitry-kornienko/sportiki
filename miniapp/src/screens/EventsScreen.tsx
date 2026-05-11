@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function EventsScreen({ initialEventId }: Props) {
-	const { events, loading, error, isRegistered, getRegStatus, getGuestReg, addEvent, addRegistration, removeRegistration, removeGuestRegistration, updateEvent } = useEvents()
+	const { events, loading, error, isRegistered, getRegStatus, getGuestReg, getConfirmation, setConfirmationLocal, addEvent, addRegistration, removeRegistration, removeGuestRegistration, updateEvent } = useEvents()
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
 	const [dismissedInitial, setDismissedInitial] = useState(false)
 	const [showCreate, setShowCreate] = useState(false)
@@ -41,12 +41,14 @@ export function EventsScreen({ initialEventId }: Props) {
 			<EventDetail
 				event={activeEvent}
 				regStatus={isRegistered(activeEvent.id) ? getRegStatus(activeEvent.id) : null}
+				confirmation={getConfirmation(activeEvent.id)}
 				guestReg={getGuestReg(activeEvent.id)}
 				onRegister={handleRegister}
 				onUnregister={removeRegistration}
 				onGuestRegister={reg => addRegistration(reg)}
 				onGuestUnregister={eventId => removeGuestRegistration(eventId)}
 				onEventUpdate={updateEvent}
+				onConfirmed={() => setConfirmationLocal(activeEvent.id)}
 				onBack={() => { setSelectedEvent(null); setDismissedInitial(true) }}
 			/>
 		)

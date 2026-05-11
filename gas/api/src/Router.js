@@ -81,6 +81,8 @@ function doPost(e) {
 				return EventsController.create(body, currentUser)
 			case 'update_event':
 				return EventsController.update(body, currentUser)
+			case 'confirm_attendance':
+				return RegistrationsController.confirmAttendance(body, currentUser)
 
 			default:
 				return Response.error(`Неизвестный action: ${action}`, 404)

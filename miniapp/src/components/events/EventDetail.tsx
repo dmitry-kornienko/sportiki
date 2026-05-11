@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { fetchEvent } from '../../api/events'
+import { confirmAttendance } from '../../api/registrations'
 import type { Event, Registration } from '../../types'
 import { EVENT_STATUS } from '../../types'
 import { Loader } from '../ui/Loader'
 import { isAdmin } from '../../utils/telegram'
 import { useEventActions } from '../../hooks/useEventActions'
+import { useToastAction } from '../../context/ToastContext'
 import { PaymentBlock } from './PaymentBlock'
 import { ParticipantList } from './ParticipantList'
 import { RegisterSheet } from './RegisterSheet'
@@ -17,24 +19,28 @@ import s from './EventDetail.module.css'
 interface Props {
 	event: Event
 	regStatus: 'MAIN' | 'RESERVE' | null
+	confirmation: string | null
 	guestReg: Registration | null
 	onRegister: (eventId: string, status: 'MAIN' | 'RESERVE') => void
 	onUnregister: (eventId: string) => void
 	onGuestRegister: (reg: Registration) => void
 	onGuestUnregister: (eventId: string) => void
 	onEventUpdate: (event: Event) => void
+	onConfirmed: () => void
 	onBack: () => void
 }
 
 export function EventDetail({
 	event: initialEvent,
 	regStatus,
+	confirmation,
 	guestReg,
 	onRegister,
 	onUnregister,
 	onGuestRegister,
 	onGuestUnregister,
 	onEventUpdate,
+	onConfirmed,
 	onBack,
 }: Props) {
 	const [event, setEvent] = useState<Event>(initialEvent)
@@ -44,6 +50,8 @@ export function EventDetail({
 	const [showGuestSheet, setShowGuestSheet] = useState(false)
 	const [showPaySheet, setShowPaySheet] = useState(false)
 	const [showEdit, setShowEdit] = useState(false)
+	const [confirmLoading, setConfirmLoading] = useState(false)
+	const showToast = useToastAction()
 
 	const actions = useEventActions({
 		event,
@@ -177,6 +185,24 @@ export function EventDetail({
 						</div>
 						<div className={s.action}>{renderButton()}</div>
 					</div>
+					{regStatus === 'MAIN' && confirmation === 'Notified' && (
+						<button
+							className={`${s.btn} ${s.btnConfirm}`}
+							disabled={confirmLoading}
+							onClick={async () => {
+								setConfirmLoading(true)
+								try {
+									await confirmAttendance(event.id)
+									onConfirmed()
+									showToast('✅ Участие подтверждено!')
+								} finally {
+									setConfirmLoading(false)
+								}
+							}}
+						>
+							{confirmLoading ? <Loader /> : '✅ Подтвердить участие'}
+						</button>
+					)}
 					{event.price > 0 && (
 						<PaymentBlock
 							price={event.price}

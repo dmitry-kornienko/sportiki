@@ -237,7 +237,7 @@ const RegRepository = {
 			username: row[COL.REGS.USERNAME] ? row[COL.REGS.USERNAME].toString().trim() : '',
 			isGuest: row[COL.REGS.IS_GUEST] === 'YES',
 			confirmation,
-			confirmed: confirmation !== '',
+			confirmed: confirmation === 'Confirmed',
 		}
 	},
 
