@@ -224,6 +224,8 @@ const RegistrationsController = {
 		const event = db.getEventById(reg.eventId)
 		if (!event) return Response.error('Событие не найдено', 404)
 
+		const stats = db.getCheckinStats(reg.eventId)
+
 		return Response.ok({
 			ticketId: reg.ticketId,
 			eventTitle: event.title,
@@ -236,6 +238,7 @@ const RegistrationsController = {
 			paymentStatus: reg.paymentStatus,
 			checkedInAt: reg.checkedInAt,
 			isGuest: reg.isGuest,
+			stats,
 		})
 	},
 
@@ -257,7 +260,8 @@ const RegistrationsController = {
 		if (reg.checkedInAt) return Response.error('Билет уже использован')
 
 		const checkedInAt = db.setCheckedIn(ticketId)
-		return Response.ok({ checkedInAt })
+		const stats = db.getCheckinStats(reg.eventId)
+		return Response.ok({ checkedInAt, stats })
 	},
 
 	/**

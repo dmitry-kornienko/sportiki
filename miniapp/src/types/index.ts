@@ -79,6 +79,11 @@ export interface Registration {
 	}
 }
 
+export interface CheckinStats {
+	registered: number
+	checkedIn: number
+}
+
 export interface TicketData {
 	ticketId: string
 	eventTitle: string
@@ -91,6 +96,7 @@ export interface TicketData {
 	paymentStatus: string
 	checkedInAt: string
 	isGuest: boolean
+	stats: CheckinStats
 }
 
 export type Screen = 'events' | 'merch' | 'scanner'

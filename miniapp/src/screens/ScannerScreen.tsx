@@ -51,7 +51,7 @@ export function ScannerScreen() {
 		setScanState('checkin-loading')
 		try {
 			const res = await checkinApi(ticket.ticketId)
-			setTicket({ ...ticket, checkedInAt: res.checkedInAt })
+			setTicket({ ...ticket, checkedInAt: res.checkedInAt, stats: res.stats })
 			setScanState('done')
 		} catch (e) {
 			setErrorMsg((e as Error).message)
@@ -188,6 +188,23 @@ function TicketCard({ ticket }: { ticket: TicketData }) {
 				{isAlreadyUsed
 					? <span className={`${s.badge} ${s.badgeUsed}`}>{ticket.checkedInAt}</span>
 					: <span className={s.cardValueMuted}>Не проходил</span>}
+			</div>
+
+			<div className={s.cardDivider} />
+
+			<div className={s.statsRow}>
+				<div className={s.statItem}>
+					<span className={s.statLabel}>👥 Записалось</span>
+					<span className={s.statValue}>{ticket.stats.registered}</span>
+				</div>
+				<div className={s.statDivider} />
+				<div className={s.statItem}>
+					<span className={s.statLabel}>✅ Прошли</span>
+					<span className={s.statValue}>
+						{ticket.stats.checkedIn}
+						<span className={s.statTotal}> / {ticket.stats.registered}</span>
+					</span>
+				</div>
 			</div>
 		</div>
 	)

@@ -316,6 +316,21 @@ const RegRepository = {
 		SheetCache.invalidate(SHEET_NAMES.REGS)
 	},
 
+	getCheckinStats(eventId) {
+		const data = SheetCache.data(SHEET_NAMES.REGS)
+		const eId = eventId.toString()
+		let registered = 0
+		let checkedIn = 0
+		for (let i = 1; i < data.length; i++) {
+			const row = data[i]
+			if (row[COL.REGS.EVENT_ID]?.toString().trim() !== eId) continue
+			if (row[COL.REGS.STATUS]?.toString().trim() !== REG_STATUS.MAIN) continue
+			registered++
+			if (row[COL.REGS.CHECKED_IN_AT] && row[COL.REGS.CHECKED_IN_AT] !== '') checkedIn++
+		}
+		return { registered, checkedIn }
+	},
+
 	findByTicketId(ticketId) {
 		const data = SheetCache.data(SHEET_NAMES.REGS)
 		const tId = ticketId.toString().trim().toUpperCase()
@@ -573,6 +588,9 @@ const db = {
 	},
 	findRegByTicketId(ticketId) {
 		return RegRepository.findByTicketId(ticketId)
+	},
+	getCheckinStats(eventId) {
+		return RegRepository.getCheckinStats(eventId)
 	},
 	setCheckedIn(ticketId) {
 		return RegRepository.setCheckedIn(ticketId)

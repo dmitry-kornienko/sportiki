@@ -29,6 +29,6 @@ export function getTicket(ticketId: string): Promise<TicketData> {
 	return get<TicketData>({ action: 'ticket', ticketId })
 }
 
-export function checkin(ticketId: string): Promise<{ checkedInAt: string }> {
+export function checkin(ticketId: string): Promise<{ checkedInAt: string; stats: import('../types').CheckinStats }> {
 	return post({ action: 'checkin', ticketId })
 }
