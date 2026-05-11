@@ -228,6 +228,7 @@ const EventRepository = {
 
 const RegRepository = {
 	_rowToReg(row) {
+		const confirmation = row[COL.REGS.CONFIRMATION] ? row[COL.REGS.CONFIRMATION].toString().trim() : ''
 		return {
 			chatId: row[COL.REGS.CHAT_ID].toString(),
 			eventId: row[COL.REGS.EVENT_ID].toString(),
@@ -235,7 +236,8 @@ const RegRepository = {
 			status: row[COL.REGS.STATUS] ? row[COL.REGS.STATUS].toString().trim() : '',
 			username: row[COL.REGS.USERNAME] ? row[COL.REGS.USERNAME].toString().trim() : '',
 			isGuest: row[COL.REGS.IS_GUEST] === 'YES',
-			confirmed: !!row[COL.REGS.CONFIRMATION] && row[COL.REGS.CONFIRMATION].toString().trim() !== '',
+			confirmation,
+			confirmed: confirmation !== '',
 		}
 	},
 
@@ -277,6 +279,24 @@ const RegRepository = {
 	createGuest(chatId, eventId, guestName, status, username, tgName) {
 		const sheet = SheetCache.sheet(SHEET_NAMES.REGS)
 		sheet.appendRow([chatId, eventId, guestName, new Date(), status, username || '', tgName || '', 'YES', ''])
+		SheetCache.invalidate(SHEET_NAMES.REGS)
+	},
+
+	// Устанавливает значение колонки CONFIRMATION для всех строк chatId+eventId.
+	setConfirmation(chatId, eventId, value) {
+		const data = SheetCache.data(SHEET_NAMES.REGS)
+		const sheet = SheetCache.sheet(SHEET_NAMES.REGS)
+		const cId = chatId.toString()
+		const eId = eventId.toString()
+		for (let i = 1; i < data.length; i++) {
+			const row = data[i]
+			if (
+				row[COL.REGS.CHAT_ID]?.toString().trim() === cId &&
+				row[COL.REGS.EVENT_ID]?.toString().trim() === eId
+			) {
+				sheet.getRange(i + 1, COL.REGS.CONFIRMATION + 1).setValue(value)
+			}
+		}
 		SheetCache.invalidate(SHEET_NAMES.REGS)
 	},
 
@@ -501,6 +521,9 @@ const db = {
 	},
 	deleteReg(chatId, eventId) {
 		return RegRepository.deleteByUserAndEvent(chatId, eventId)
+	},
+	setConfirmation(chatId, eventId, value) {
+		return RegRepository.setConfirmation(chatId, eventId, value)
 	},
 	promoteFirstReserve(eventId) {
 		return RegRepository.promoteFirstReserve(eventId)

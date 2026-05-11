@@ -13,12 +13,14 @@ export default function App() {
 	const { isAdmin } = useTelegram()
 	const [screen, setScreen] = useState<Screen>('events')
 
+	const initialEventId = new URLSearchParams(window.location.search).get('eventId') ?? undefined
+
 	return (
 		<ToastProvider>
 			<div className={styles.app}>
 				<Header />
 				<div className={styles.content}>
-					{screen === 'events' && <EventsScreen />}
+					{screen === 'events' && <EventsScreen initialEventId={initialEventId} />}
 					{screen === 'merch' && <MerchScreen />}
 					{screen === 'scanner' && <ScannerScreen />}
 				</div>

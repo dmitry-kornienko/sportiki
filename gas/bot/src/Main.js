@@ -381,7 +381,6 @@ const CallbackHandlers = {
 		}
 
 		TelegramApi.sendMessage(chatId, Texts.deleteSuccess)
-		Sender.eventDetails(chatId, eventId)
 	},
 
 	// --- Подтверждение участия ---
@@ -390,7 +389,7 @@ const CallbackHandlers = {
 		const eventId = this._extractId(data, 'checkin_yes_')
 		db.setConfirmation(chatId, eventId, STATUSES.CONFIRMED)
 		TelegramApi.answerCallback(cbId, Texts.toast.confirmed)
-		Sender.eventDetails(chatId, eventId, messageId)
+		TelegramApi.editMessage(chatId, messageId, Texts.checkinConfirmed, Keyboards.eventInMiniApp(eventId))
 	},
 
 	checkinNo(chatId, data, cbId) {
@@ -405,9 +404,8 @@ const CallbackHandlers = {
 	},
 
 	abortCancel(chatId, data, cbId, messageId) {
-		TelegramApi.answerCallback(cbId, Texts.toast.cancelled)
-		const eventId = this._extractId(data, 'abort_cancel_')
-		Sender.eventDetails(chatId, eventId, messageId)
+		TelegramApi.answerCallback(cbId)
+		TelegramApi.deleteMessage(chatId, messageId)
 	},
 
 	// --- Админ: создание события ---
@@ -843,6 +841,23 @@ const TelegramApi = {
 				payload: JSON.stringify(payload),
 			},
 		)
+	},
+
+	deleteMessage(chatId, messageId) {
+		const token = getBotToken()
+		try {
+			UrlFetchApp.fetch(
+				`https://api.telegram.org/bot${token}/deleteMessage`,
+				{
+					method: 'post',
+					contentType: 'application/json',
+					payload: JSON.stringify({ chat_id: chatId, message_id: messageId }),
+					muteHttpExceptions: true,
+				},
+			)
+		} catch (e) {
+			console.warn('deleteMessage failed: ' + e)
+		}
 	},
 }
 

@@ -5,6 +5,27 @@
 
 const Texts = {
 	/**
+	 * Напоминание за 24 часа до события.
+	 */
+	reminder({ event, isMe, guestCount }) {
+		let who
+		if (isMe && guestCount > 0) who = 'вы с гостем'
+		else if (isMe) who = 'ты'
+		else who = 'твой гость'
+
+		const eventLine = (event.type ? event.type + ' ' : '') + '<b>' + event.title + '</b>'
+		const whoText = (isMe && guestCount > 0) ? 'Вы с гостем' : 'Ты'
+		return (
+			`👋 Напоминаем о твоей записи!\n\n` +
+			`${eventLine}\n` +
+			`📅 ${event.date}  🕐 ${event.time}\n\n` +
+			`${whoText} в списке участников. Ждём! Подтверди участие 👇`
+		)
+	},
+
+
+
+	/**
 	 * Участник отменил запись → человека из резерва перевели в основной состав.
 	 */
 	promoted({ eventLine, date, time }) {

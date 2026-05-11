@@ -297,6 +297,14 @@ const Keyboards = {
 		return { inline_keyboard: buttons }
 	},
 
+	eventInMiniApp(eventId) {
+		return {
+			inline_keyboard: [
+				[{ text: '📱 Подробности события', web_app: { url: `${MINI_APP_URL}?eventId=${eventId}` } }],
+			],
+		}
+	},
+
 	backToEvent(eventId) {
 		return {
 			inline_keyboard: [

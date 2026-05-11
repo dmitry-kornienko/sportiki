@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useEvents } from '../hooks/useEvents'
 import { EventCard } from '../components/events/EventCard'
 import { EventDetail } from '../components/events/EventDetail'
@@ -8,10 +8,21 @@ import type { Event, Registration } from '../types'
 import { getTelegramUserId, isAdmin } from '../utils/telegram'
 import s from './EventsScreen.module.css'
 
-export function EventsScreen() {
+interface Props {
+	initialEventId?: string
+}
+
+export function EventsScreen({ initialEventId }: Props) {
 	const { events, loading, error, isRegistered, getRegStatus, getGuestReg, addEvent, addRegistration, removeRegistration, removeGuestRegistration, updateEvent } = useEvents()
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
 	const [showCreate, setShowCreate] = useState(false)
+
+	useEffect(() => {
+		if (initialEventId && events.length > 0 && selectedEvent === null) {
+			const event = events.find(e => e.id === initialEventId)
+			if (event) setSelectedEvent(event)
+		}
+	}, [initialEventId, events])
 
 	if (loading) return <Loader fullscreen />
 	if (error) return <div className={s.error}>Ошибка: {error}</div>

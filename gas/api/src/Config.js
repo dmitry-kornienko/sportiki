@@ -78,20 +78,61 @@ function getSpreadsheet() {
 
 /**
  * Отправляет сообщение пользователю через Telegram Bot API.
- * Используется для уведомлений при ребалансировке участников.
  * @param {string|number} chatId
  * @param {string} text
+ * @param {object|null} keyboard — inline_keyboard объект или null
+ * @returns {string|null} message_id отправленного сообщения или null при ошибке
  */
-function sendTelegramMessage(chatId, text) {
+function sendTelegramMessage(chatId, text, keyboard = null) {
 	try {
 		const token = getBotToken()
-		UrlFetchApp.fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+		const payload = { chat_id: chatId, text, parse_mode: 'HTML' }
+		if (keyboard) payload.reply_markup = JSON.stringify(keyboard)
+
+		const res = UrlFetchApp.fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
 			method: 'post',
 			contentType: 'application/json',
-			payload: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
+			payload: JSON.stringify(payload),
+			muteHttpExceptions: true,
+		})
+		const json = JSON.parse(res.getContentText())
+		return json.ok ? json.result.message_id : null
+	} catch (e) {
+		console.error('sendTelegramMessage error: ' + e)
+		return null
+	}
+}
+
+/**
+ * Редактирует существующее сообщение бота.
+ * @param {string|number} chatId
+ * @param {string|number} messageId
+ * @param {string} text
+ */
+function editTelegramMessage(chatId, messageId, text) {
+	try {
+		const token = getBotToken()
+		UrlFetchApp.fetch(`https://api.telegram.org/bot${token}/editMessageText`, {
+			method: 'post',
+			contentType: 'application/json',
+			payload: JSON.stringify({
+				chat_id: chatId,
+				message_id: messageId,
+				text,
+				parse_mode: 'HTML',
+			}),
 			muteHttpExceptions: true,
 		})
 	} catch (e) {
-		console.error('sendTelegramMessage error: ' + e)
+		console.error('editTelegramMessage error: ' + e)
 	}
+}
+
+/**
+ * Возвращает URL Mini App из Script Properties.
+ * @returns {string}
+ */
+function getMiniAppUrl() {
+	const props = PropertiesService.getScriptProperties().getProperties()
+	return props['MINI_APP_URL'] || 'https://dmitry-kornienko.github.io/sportiki'
 }
