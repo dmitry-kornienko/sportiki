@@ -7,12 +7,13 @@ interface Props {
 	canRegisterWithGuest: boolean
 	hasGuest: boolean
 	loading: boolean
+	isReserve?: boolean
 	onRegisterOnly: () => void
 	onRegisterWithGuest: (guestName: string) => void
 	onClose: () => void
 }
 
-export function RegisterSheet({ canRegisterWithGuest, hasGuest, loading, onRegisterOnly, onRegisterWithGuest, onClose }: Props) {
+export function RegisterSheet({ canRegisterWithGuest, hasGuest, loading, isReserve, onRegisterOnly, onRegisterWithGuest, onClose }: Props) {
 	const [showGuestCard, setShowGuestCard] = useState(false)
 	const [guestName, setGuestName] = useState('')
 
@@ -26,6 +27,14 @@ export function RegisterSheet({ canRegisterWithGuest, hasGuest, loading, onRegis
 		<>
 			<div className={s.sheetBackdrop} onClick={handleClose} />
 			<div className={s.sheet}>
+				{isReserve && (
+					<div className={s.reserveInfo}>
+						<div className={s.reserveInfoTitle}>⏳ Запись в резерв</div>
+						<div className={s.reserveInfoText}>
+							Основные места заняты. Ты попадёшь в список ожидания — если кто-то отменит запись или организатор увеличит лимит, ты автоматически переместишься в основной состав по очереди.
+						</div>
+					</div>
+				)}
 				<div className={s.sheetTitle}>Ты будешь один?</div>
 				<button className={s.sheetOption} onClick={onRegisterOnly} disabled={loading}>
 					<span className={s.sheetOptionIcon}>👤</span>

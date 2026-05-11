@@ -25,6 +25,7 @@
 	background: none;
 	border-radius: 12px;
 	transition: transform 0.15s;
+	position: relative;
 }
 
 .btn:active {
@@ -47,10 +48,27 @@
 	transition: color 0.2s;
 }
 
+.btn.active::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 28px;
+	height: 3px;
+	background: var(--accent);
+	border-radius: 0 0 4px 4px;
+}
+
+.btn.active {
+	background: var(--card-bg);
+}
+
 .btn.active .label {
 	color: var(--accent);
+	font-weight: 800;
 }
 
 .btn.active .icon {
-	transform: scale(1.15);
+	transform: scale(1.22);
 }

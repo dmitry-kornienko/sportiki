@@ -414,6 +414,28 @@
 	to { transform: translateY(0); }
 }
 
+.reserveInfo {
+	background: var(--warning-bg-subtle);
+	border: 1.5px solid var(--warning-border);
+	border-radius: 12px;
+	padding: 12px 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.reserveInfoTitle {
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--warning-text);
+}
+
+.reserveInfoText {
+	font-size: 13px;
+	color: var(--warning-text);
+	line-height: 1.5;
+}
+
 .sheetTitle {
 	font-family: 'Barlow Condensed', sans-serif;
 	font-weight: 800;

@@ -245,6 +245,7 @@ export function EventDetail({
 					canRegisterWithGuest={canRegisterWithGuest}
 					hasGuest={!!guestReg}
 					loading={actions.loading}
+					isReserve={event.isFull && event.hasReserve}
 					onRegisterOnly={() => { setShowRegisterSheet(false); actions.registerOnly() }}
 					onRegisterWithGuest={name => { setShowRegisterSheet(false); actions.registerWithGuest(name) }}
 					onClose={() => setShowRegisterSheet(false)}
