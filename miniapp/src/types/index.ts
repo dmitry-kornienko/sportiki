@@ -79,5 +79,19 @@ export interface Registration {
 	}
 }
 
+export interface TicketData {
+	ticketId: string
+	eventTitle: string
+	eventType: string
+	eventDate: string
+	eventTime: string
+	participantName: string
+	username: string
+	status: 'MAIN' | 'RESERVE'
+	paymentStatus: string
+	checkedInAt: string
+	isGuest: boolean
+}
+
 export type Screen = 'events' | 'merch' | 'scanner'
 export type MerchTab = 'catalog' | 'cart'

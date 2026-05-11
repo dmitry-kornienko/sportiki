@@ -236,6 +236,10 @@ const EventRepository = {
 const RegRepository = {
 	_rowToReg(row) {
 		const confirmation = row[COL.REGS.CONFIRMATION] ? row[COL.REGS.CONFIRMATION].toString().trim() : ''
+		const checkedInRaw = row[COL.REGS.CHECKED_IN_AT]
+		const checkedInAt = checkedInRaw instanceof Date
+			? Utilities.formatDate(checkedInRaw, Session.getScriptTimeZone(), 'dd.MM.yyyy HH:mm')
+			: (checkedInRaw ? checkedInRaw.toString().trim() : '')
 		return {
 			chatId: row[COL.REGS.CHAT_ID].toString(),
 			eventId: row[COL.REGS.EVENT_ID].toString(),
@@ -247,6 +251,7 @@ const RegRepository = {
 			confirmed: confirmation === 'Confirmed',
 			ticketId: row[COL.REGS.TICKET_ID] ? row[COL.REGS.TICKET_ID].toString().trim() : '',
 			paymentStatus: row[COL.REGS.PAYMENT_STATUS] ? row[COL.REGS.PAYMENT_STATUS].toString().trim() : '',
+			checkedInAt,
 		}
 	},
 
@@ -309,6 +314,34 @@ const RegRepository = {
 			}
 		}
 		SheetCache.invalidate(SHEET_NAMES.REGS)
+	},
+
+	findByTicketId(ticketId) {
+		const data = SheetCache.data(SHEET_NAMES.REGS)
+		const tId = ticketId.toString().trim().toUpperCase()
+		for (let i = 1; i < data.length; i++) {
+			const row = data[i]
+			if (row[COL.REGS.TICKET_ID]?.toString().trim().toUpperCase() === tId) {
+				return this._rowToReg(row)
+			}
+		}
+		return null
+	},
+
+	setCheckedIn(ticketId) {
+		const data = SheetCache.data(SHEET_NAMES.REGS)
+		const sheet = SheetCache.sheet(SHEET_NAMES.REGS)
+		const tId = ticketId.toString().trim().toUpperCase()
+		const now = new Date()
+		for (let i = 1; i < data.length; i++) {
+			const row = data[i]
+			if (row[COL.REGS.TICKET_ID]?.toString().trim().toUpperCase() === tId) {
+				sheet.getRange(i + 1, COL.REGS.CHECKED_IN_AT + 1).setValue(now)
+				SheetCache.invalidate(SHEET_NAMES.REGS)
+				return Utilities.formatDate(now, Session.getScriptTimeZone(), 'dd.MM.yyyy HH:mm')
+			}
+		}
+		return null
 	},
 
 	deleteGuestByUserAndEvent(chatId, eventId) {
@@ -537,6 +570,12 @@ const db = {
 	},
 	setConfirmation(chatId, eventId, value) {
 		return RegRepository.setConfirmation(chatId, eventId, value)
+	},
+	findRegByTicketId(ticketId) {
+		return RegRepository.findByTicketId(ticketId)
+	},
+	setCheckedIn(ticketId) {
+		return RegRepository.setCheckedIn(ticketId)
 	},
 	promoteFirstReserve(eventId) {
 		return RegRepository.promoteFirstReserve(eventId)

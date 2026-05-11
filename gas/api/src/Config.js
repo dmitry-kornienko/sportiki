@@ -58,6 +58,28 @@ function isAdmin(userId) {
 }
 
 /**
+ * Возвращает список ID пользователей с правом сканирования (охранники/хостес).
+ * Ключ: SCANNER_IDS (через запятую) в Script Properties.
+ * @returns {string[]}
+ */
+function getScannerIds() {
+	const props = PropertiesService.getScriptProperties().getProperties()
+	return (props['SCANNER_IDS'] || '').split(',').map(s => s.trim()).filter(Boolean)
+}
+
+/**
+ * Проверяет, есть ли у пользователя право сканировать билеты.
+ * Доступ есть у администраторов и пользователей из SCANNER_IDS.
+ * @param {string|number} userId
+ * @returns {boolean}
+ */
+function canScan(userId) {
+	if (!userId) return false
+	const id = userId.toString()
+	return getAdminIds().includes(id) || getScannerIds().includes(id)
+}
+
+/**
  * Возвращает токен бота из Script Properties.
  * Используется для верификации Telegram initData.
  * @returns {string}

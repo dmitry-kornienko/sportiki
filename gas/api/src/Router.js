@@ -34,6 +34,9 @@ function doGet(e) {
 			case 'registrations':
 				return RegistrationsController.list(params, currentUser)
 
+			case 'ticket':
+				return RegistrationsController.getTicket(params, currentUser)
+
 			case 'me':
 				return UsersController.me(params, currentUser)
 
@@ -83,6 +86,9 @@ function doPost(e) {
 				return EventsController.update(body, currentUser)
 			case 'confirm_attendance':
 				return RegistrationsController.confirmAttendance(body, currentUser)
+
+			case 'checkin':
+				return RegistrationsController.checkin(body, currentUser)
 
 			default:
 				return Response.error(`Неизвестный action: ${action}`, 404)

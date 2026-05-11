@@ -57,6 +57,7 @@ const UsersController = {
 			id: chatId,
 			username: user.username || '',
 			firstName: user.first_name || '',
+			canScan: canScan(user.id),
 			registrations: activeRegs,
 		})
 	},

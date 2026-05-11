@@ -207,6 +207,60 @@ const RegistrationsController = {
 	},
 
 	/**
+	 * GET ?action=ticket&ticketId=X
+	 * Возвращает данные билета по TicketId. Только для администраторов.
+	 */
+	getTicket(params, user) {
+		if (!canScan(user.id)) return Response.error('Доступ запрещён', 403)
+
+		const ticketId = params.ticketId
+		if (!ticketId) return Response.error('Не указан ticketId')
+
+		db.clearCache()
+
+		const reg = db.findRegByTicketId(ticketId)
+		if (!reg) return Response.error('Билет не найден', 404)
+
+		const event = db.getEventById(reg.eventId)
+		if (!event) return Response.error('Событие не найдено', 404)
+
+		return Response.ok({
+			ticketId: reg.ticketId,
+			eventTitle: event.title,
+			eventType: event.type,
+			eventDate: event.date,
+			eventTime: event.time,
+			participantName: reg.name,
+			username: reg.username,
+			status: reg.status,
+			paymentStatus: reg.paymentStatus,
+			checkedInAt: reg.checkedInAt,
+			isGuest: reg.isGuest,
+		})
+	},
+
+	/**
+	 * POST action=checkin
+	 * Body: { ticketId }
+	 * Отмечает проход по билету. Только для администраторов.
+	 */
+	checkin(body, user) {
+		if (!canScan(user.id)) return Response.error('Доступ запрещён', 403)
+
+		const ticketId = body.ticketId
+		if (!ticketId) return Response.error('Не указан ticketId')
+
+		db.clearCache()
+
+		const reg = db.findRegByTicketId(ticketId)
+		if (!reg) return Response.error('Билет не найден', 404)
+		if (reg.checkedInAt) return Response.error('Билет уже использован')
+
+		const checkedInAt = db.setCheckedIn(ticketId)
+		return Response.ok({ checkedInAt })
+	},
+
+	/**
 	 * POST action=unregister
 	 * Body: { eventId }
 	 * Отменяет регистрацию пользователя и продвигает первого из резерва.

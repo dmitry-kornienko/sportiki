@@ -10,7 +10,7 @@ import type { Screen } from './types'
 import styles from './App.module.css'
 
 export default function App() {
-	const { isAdmin } = useTelegram()
+	const { canScan } = useTelegram()
 	const [screen, setScreen] = useState<Screen>('events')
 
 	const initialEventId = new URLSearchParams(window.location.search).get('eventId') ?? undefined
@@ -24,7 +24,7 @@ export default function App() {
 					{screen === 'merch' && <MerchScreen />}
 					{screen === 'scanner' && <ScannerScreen />}
 				</div>
-				<BottomNav current={screen} onNavigate={setScreen} showScanner={isAdmin} />
+				<BottomNav current={screen} onNavigate={setScreen} showScanner={canScan} />
 			</div>
 		</ToastProvider>
 	)
