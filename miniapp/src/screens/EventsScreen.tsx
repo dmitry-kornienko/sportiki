@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useEvents } from '../hooks/useEvents'
 import { EventCard } from '../components/events/EventCard'
 import { EventDetail } from '../components/events/EventDetail'
@@ -15,17 +15,14 @@ interface Props {
 export function EventsScreen({ initialEventId }: Props) {
 	const { events, loading, error, isRegistered, getRegStatus, getGuestReg, addEvent, addRegistration, removeRegistration, removeGuestRegistration, updateEvent } = useEvents()
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+	const [dismissedInitial, setDismissedInitial] = useState(false)
 	const [showCreate, setShowCreate] = useState(false)
-
-	useEffect(() => {
-		if (initialEventId && events.length > 0 && selectedEvent === null) {
-			const event = events.find(e => e.id === initialEventId)
-			if (event) setSelectedEvent(event)
-		}
-	}, [initialEventId, events])
 
 	if (loading) return <Loader fullscreen />
 	if (error) return <div className={s.error}>Ошибка: {error}</div>
+
+	const activeEvent = selectedEvent
+		?? (!dismissedInitial && initialEventId ? (events.find(e => e.id === initialEventId) ?? null) : null)
 
 	function handleRegister(eventId: string, status: 'MAIN' | 'RESERVE') {
 		const reg: Registration = {
@@ -39,18 +36,18 @@ export function EventsScreen({ initialEventId }: Props) {
 		addRegistration(reg)
 	}
 
-	if (selectedEvent) {
+	if (activeEvent) {
 		return (
 			<EventDetail
-				event={selectedEvent}
-				regStatus={isRegistered(selectedEvent.id) ? getRegStatus(selectedEvent.id) : null}
-				guestReg={getGuestReg(selectedEvent.id)}
+				event={activeEvent}
+				regStatus={isRegistered(activeEvent.id) ? getRegStatus(activeEvent.id) : null}
+				guestReg={getGuestReg(activeEvent.id)}
 				onRegister={handleRegister}
 				onUnregister={removeRegistration}
 				onGuestRegister={reg => addRegistration(reg)}
 				onGuestUnregister={eventId => removeGuestRegistration(eventId)}
 				onEventUpdate={updateEvent}
-				onBack={() => setSelectedEvent(null)}
+				onBack={() => { setSelectedEvent(null); setDismissedInitial(true) }}
 			/>
 		)
 	}
@@ -70,7 +67,7 @@ export function EventsScreen({ initialEventId }: Props) {
 						key={event.id}
 						event={event}
 						regStatus={isRegistered(event.id) ? (getRegStatus(event.id) ?? getGuestReg(event.id)?.status ?? null) : null}
-						onClick={() => setSelectedEvent(event)}
+						onClick={() => { setSelectedEvent(event); setDismissedInitial(true) }}
 					/>
 				))}
 			</div>
