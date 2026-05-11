@@ -35,6 +35,10 @@ export function useEvents() {
 		return registrations.find(r => r.eventId === eventId && !r.isGuest)?.confirmation ?? null
 	}
 
+	function getTicketId(eventId: string): string | null {
+		return registrations.find(r => r.eventId === eventId && !r.isGuest)?.ticketId ?? null
+	}
+
 	function setConfirmationLocal(eventId: string) {
 		setRegistrations(prev => prev.map(r =>
 			r.eventId === eventId && !r.isGuest ? { ...r, confirmation: 'Confirmed' } : r
@@ -78,6 +82,7 @@ export function useEvents() {
 		getRegStatus,
 		getGuestReg,
 		getConfirmation,
+		getTicketId,
 		setConfirmationLocal,
 		addEvent,
 		updateEvent,

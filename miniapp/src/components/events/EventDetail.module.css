@@ -653,11 +653,28 @@
 	color: var(--warning-text);
 }
 
+.ticketRow {
+	display: flex;
+	gap: 8px;
+}
+
+.ticketRow > .btn {
+	flex: 1;
+}
+
+.btnQr {
+	background: var(--card-bg);
+	border: 1.5px solid var(--border);
+	color: var(--text);
+}
+
+.btnQr:active {
+	background: var(--border);
+}
+
 .btnConfirm {
 	background: #34c759;
 	color: #fff;
-	width: 100%;
-	margin-bottom: 8px;
 }
 
 .btnFull {

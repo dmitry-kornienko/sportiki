@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function EventsScreen({ initialEventId }: Props) {
-	const { events, loading, error, isRegistered, getRegStatus, getGuestReg, getConfirmation, setConfirmationLocal, addEvent, addRegistration, removeRegistration, removeGuestRegistration, updateEvent } = useEvents()
+	const { events, loading, error, isRegistered, getRegStatus, getGuestReg, getConfirmation, getTicketId, setConfirmationLocal, addEvent, addRegistration, removeRegistration, removeGuestRegistration, updateEvent } = useEvents()
 	const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
 	const [dismissedInitial, setDismissedInitial] = useState(false)
 	const [showCreate, setShowCreate] = useState(false)
@@ -24,7 +24,7 @@ export function EventsScreen({ initialEventId }: Props) {
 	const activeEvent = selectedEvent
 		?? (!dismissedInitial && initialEventId ? (events.find(e => e.id === initialEventId) ?? null) : null)
 
-	function handleRegister(eventId: string, status: 'MAIN' | 'RESERVE') {
+	function handleRegister(eventId: string, status: 'MAIN' | 'RESERVE', ticketId: string) {
 		const reg: Registration = {
 			chatId: getTelegramUserId(),
 			eventId,
@@ -32,6 +32,7 @@ export function EventsScreen({ initialEventId }: Props) {
 			username: '',
 			status,
 			isGuest: false,
+			ticketId,
 		}
 		addRegistration(reg)
 	}
@@ -43,6 +44,7 @@ export function EventsScreen({ initialEventId }: Props) {
 				regStatus={isRegistered(activeEvent.id) ? getRegStatus(activeEvent.id) : null}
 				confirmation={getConfirmation(activeEvent.id)}
 				guestReg={getGuestReg(activeEvent.id)}
+				ticketId={isRegistered(activeEvent.id) ? getTicketId(activeEvent.id) : null}
 				onRegister={handleRegister}
 				onUnregister={removeRegistration}
 				onGuestRegister={reg => addRegistration(reg)}

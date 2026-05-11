@@ -1,0 +1,94 @@
+.backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+}
+
+.sheet {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: var(--white);
+	border-radius: 20px 20px 0 0;
+	padding: 24px 20px calc(env(safe-area-inset-bottom) + 24px);
+	z-index: 1001;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	max-height: 90vh;
+	overflow-y: auto;
+	animation: slideUp 0.25s ease-out;
+}
+
+@keyframes slideUp {
+	from { transform: translateY(100%); }
+	to { transform: translateY(0); }
+}
+
+.title {
+	font-family: 'Barlow Condensed', sans-serif;
+	font-weight: 800;
+	font-size: 20px;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	color: var(--accent);
+}
+
+.eventName {
+	font-size: 14px;
+	color: var(--gray);
+	margin-top: -8px;
+}
+
+.qrBlock {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	padding: 16px;
+	background: var(--card-bg);
+	border: 1.5px solid var(--border);
+	border-radius: 16px;
+}
+
+.qrLabel {
+	font-size: 13px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--gray);
+	align-self: flex-start;
+}
+
+.qrWrap {
+	padding: 12px;
+	background: #fff;
+	border-radius: 12px;
+	line-height: 0;
+}
+
+.qrCode {
+	font-size: 13px;
+	color: var(--gray);
+	font-family: monospace;
+	letter-spacing: 0.08em;
+}
+
+.closeBtn {
+	width: 100%;
+	padding: 14px;
+	background: var(--accent);
+	color: #fff;
+	border: none;
+	border-radius: 14px;
+	font-size: 15px;
+	font-weight: 700;
+	cursor: pointer;
+	margin-top: 4px;
+}
+
+.closeBtn:active {
+	opacity: 0.85;
+}

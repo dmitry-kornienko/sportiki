@@ -83,9 +83,9 @@ const RegistrationsController = {
 			const username = user.username ? '@' + user.username : ''
 			const tgName = user.first_name || ''
 
-			db.createReg(chatId, eventId, name, status, username, tgName)
+			const ticketId = db.createReg(chatId, eventId, name, status, username, tgName)
 
-			return Response.ok({ status, eventId })
+			return Response.ok({ status, eventId, ticketId })
 		} finally {
 			lock.releaseLock()
 		}
@@ -139,9 +139,9 @@ const RegistrationsController = {
 
 			const username = user.username ? '@' + user.username : ''
 			const tgName = user.first_name || ''
-			db.createGuestReg(chatId, eventId, guestName, status, username, tgName)
+			const ticketId = db.createGuestReg(chatId, eventId, guestName, status, username, tgName)
 
-			return Response.ok({ status, eventId, guestName })
+			return Response.ok({ status, eventId, guestName, ticketId })
 		} finally {
 			lock.releaseLock()
 		}

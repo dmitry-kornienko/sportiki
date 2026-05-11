@@ -14,14 +14,16 @@ import { UnregisterSheet } from './UnregisterSheet'
 import { GuestSheet } from './GuestSheet'
 import { PaymentSheet } from './PaymentSheet'
 import { CreateEventSheet } from './CreateEventSheet'
+import { QrSheet } from './QrSheet'
 import s from './EventDetail.module.css'
 
 interface Props {
 	event: Event
 	regStatus: 'MAIN' | 'RESERVE' | null
 	confirmation: string | null
+	ticketId: string | null
 	guestReg: Registration | null
-	onRegister: (eventId: string, status: 'MAIN' | 'RESERVE') => void
+	onRegister: (eventId: string, status: 'MAIN' | 'RESERVE', ticketId: string) => void
 	onUnregister: (eventId: string) => void
 	onGuestRegister: (reg: Registration) => void
 	onGuestUnregister: (eventId: string) => void
@@ -34,6 +36,7 @@ export function EventDetail({
 	event: initialEvent,
 	regStatus,
 	confirmation,
+	ticketId,
 	guestReg,
 	onRegister,
 	onUnregister,
@@ -50,6 +53,7 @@ export function EventDetail({
 	const [showGuestSheet, setShowGuestSheet] = useState(false)
 	const [showPaySheet, setShowPaySheet] = useState(false)
 	const [showEdit, setShowEdit] = useState(false)
+	const [showQrSheet, setShowQrSheet] = useState(false)
 	const [confirmLoading, setConfirmLoading] = useState(false)
 	const showToast = useToastAction()
 
@@ -185,23 +189,30 @@ export function EventDetail({
 						</div>
 						<div className={s.action}>{renderButton()}</div>
 					</div>
-					{regStatus === 'MAIN' && confirmation === 'Notified' && (
-						<button
-							className={`${s.btn} ${s.btnConfirm}`}
-							disabled={confirmLoading}
-							onClick={async () => {
-								setConfirmLoading(true)
-								try {
-									await confirmAttendance(event.id)
-									onConfirmed()
-									showToast('✅ Участие подтверждено!')
-								} finally {
-									setConfirmLoading(false)
-								}
-							}}
-						>
-							{confirmLoading ? <Loader /> : '✅ Подтвердить участие'}
-						</button>
+					{(regStatus === 'MAIN' || regStatus === 'RESERVE') && ticketId && (
+						<div className={s.ticketRow}>
+							<button className={`${s.btn} ${s.btnQr}`} onClick={() => setShowQrSheet(true)}>
+								🎟 Мой QR
+							</button>
+							{regStatus === 'MAIN' && confirmation === 'Notified' && (
+								<button
+									className={`${s.btn} ${s.btnConfirm}`}
+									disabled={confirmLoading}
+									onClick={async () => {
+										setConfirmLoading(true)
+										try {
+											await confirmAttendance(event.id)
+											onConfirmed()
+											showToast('✅ Участие подтверждено!')
+										} finally {
+											setConfirmLoading(false)
+										}
+									}}
+								>
+									{confirmLoading ? <Loader /> : '✅ Подтвердить'}
+								</button>
+							)}
+						</div>
 					)}
 					{event.price > 0 && (
 						<PaymentBlock
@@ -274,6 +285,15 @@ export function EventDetail({
 					event={event}
 					onUpdated={() => { setShowEdit(false); actions.refreshEvent() }}
 					onClose={() => setShowEdit(false)}
+				/>
+			)}
+
+			{showQrSheet && ticketId && (
+				<QrSheet
+					ticketId={ticketId}
+					guestTicketId={guestReg?.ticketId}
+					eventTitle={event.title}
+					onClose={() => setShowQrSheet(false)}
 				/>
 			)}
 		</>

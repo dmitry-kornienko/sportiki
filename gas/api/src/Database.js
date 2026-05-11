@@ -31,6 +31,9 @@ const COL = Object.freeze({
 		TG_NAME: 6,
 		IS_GUEST: 7,
 		CONFIRMATION: 8,
+		TICKET_ID: 9,
+		PAYMENT_STATUS: 10,
+		CHECKED_IN_AT: 11,
 	},
 	USERS: {
 		CHAT_ID: 0,
@@ -86,6 +89,10 @@ const SheetCache = {
 		this._data = {}
 		this._displayData = {}
 	},
+}
+
+function _generateTicketId() {
+	return Utilities.getUuid().replace(/-/g, '').substring(0, 12).toUpperCase()
 }
 
 // --- EventRepository ---
@@ -238,6 +245,8 @@ const RegRepository = {
 			isGuest: row[COL.REGS.IS_GUEST] === 'YES',
 			confirmation,
 			confirmed: confirmation === 'Confirmed',
+			ticketId: row[COL.REGS.TICKET_ID] ? row[COL.REGS.TICKET_ID].toString().trim() : '',
+			paymentStatus: row[COL.REGS.PAYMENT_STATUS] ? row[COL.REGS.PAYMENT_STATUS].toString().trim() : '',
 		}
 	},
 
@@ -278,8 +287,10 @@ const RegRepository = {
 
 	createGuest(chatId, eventId, guestName, status, username, tgName) {
 		const sheet = SheetCache.sheet(SHEET_NAMES.REGS)
-		sheet.appendRow([chatId, eventId, guestName, new Date(), status, username || '', tgName || '', 'YES', ''])
+		const ticketId = _generateTicketId()
+		sheet.appendRow([chatId, eventId, guestName, new Date(), status, username || '', tgName || '', 'YES', '', ticketId, '', ''])
 		SheetCache.invalidate(SHEET_NAMES.REGS)
+		return ticketId
 	},
 
 	// Устанавливает значение колонки CONFIRMATION для всех строк chatId+eventId.
@@ -339,8 +350,10 @@ const RegRepository = {
 
 	create(chatId, eventId, name, status, username, tgName) {
 		const sheet = SheetCache.sheet(SHEET_NAMES.REGS)
-		sheet.appendRow([chatId, eventId, name, new Date(), status, username, tgName, 'NO', ''])
+		const ticketId = _generateTicketId()
+		sheet.appendRow([chatId, eventId, name, new Date(), status, username, tgName, 'NO', '', ticketId, '', ''])
 		SheetCache.invalidate(SHEET_NAMES.REGS)
+		return ticketId
 	},
 
 	deleteByUserAndEvent(chatId, eventId) {
@@ -511,13 +524,13 @@ const db = {
 		return RegRepository.findGuestByUserAndEvent(chatId, eventId)
 	},
 	createGuestReg(chatId, eventId, guestName, status, username, tgName) {
-		return RegRepository.createGuest(chatId, eventId, guestName, status, username, tgName)
+		return RegRepository.createGuest(chatId, eventId, guestName, status, username, tgName) // returns ticketId
 	},
 	deleteGuestReg(chatId, eventId) {
 		return RegRepository.deleteGuestByUserAndEvent(chatId, eventId)
 	},
 	createReg(chatId, eventId, name, status, username, tgName) {
-		return RegRepository.create(chatId, eventId, name, status, username, tgName)
+		return RegRepository.create(chatId, eventId, name, status, username, tgName) // returns ticketId
 	},
 	deleteReg(chatId, eventId) {
 		return RegRepository.deleteByUserAndEvent(chatId, eventId)

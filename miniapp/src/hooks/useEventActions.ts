@@ -8,7 +8,7 @@ interface Props {
 	event: Event
 	guestReg: Registration | null
 	setEvent: (e: Event) => void
-	onRegister: (eventId: string, status: 'MAIN' | 'RESERVE') => void
+	onRegister: (eventId: string, status: 'MAIN' | 'RESERVE', ticketId: string) => void
 	onUnregister: (eventId: string) => void
 	onGuestRegister: (reg: Registration) => void
 	onGuestUnregister: (eventId: string) => void
@@ -42,7 +42,7 @@ export function useEventActions({
 		setLoading(true)
 		try {
 			const res = await register(event.id)
-			onRegister(event.id, res.status as 'MAIN' | 'RESERVE')
+			onRegister(event.id, res.status as 'MAIN' | 'RESERVE', res.ticketId)
 			toast(res.status === 'MAIN' ? 'Вы записаны!' : 'Вы в резерве')
 			refreshEvent()
 		} catch (e) {
@@ -56,7 +56,7 @@ export function useEventActions({
 		setLoading(true)
 		try {
 			const res = await register(event.id)
-			onRegister(event.id, res.status as 'MAIN' | 'RESERVE')
+			onRegister(event.id, res.status as 'MAIN' | 'RESERVE', res.ticketId)
 			try {
 				const guestRes = await registerGuest(event.id, guestName)
 				onGuestRegister({
@@ -66,6 +66,7 @@ export function useEventActions({
 					username: '',
 					status: guestRes.status as 'MAIN' | 'RESERVE',
 					isGuest: true,
+					ticketId: guestRes.ticketId,
 				})
 				toast(res.status === 'MAIN' ? 'Вы записаны вместе с гостем!' : 'Вы в резерве вместе с гостем!')
 			} catch {
@@ -90,6 +91,7 @@ export function useEventActions({
 				username: '',
 				status: res.status as 'MAIN' | 'RESERVE',
 				isGuest: true,
+				ticketId: res.ticketId,
 			})
 			toast('Гость добавлен')
 			refreshEvent()

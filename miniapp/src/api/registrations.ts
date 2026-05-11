@@ -1,7 +1,7 @@
 import { get, post } from './client'
 import type { Registration } from '../types'
 
-export function register(eventId: string): Promise<{ status: string; eventId: string }> {
+export function register(eventId: string): Promise<{ status: string; eventId: string; ticketId: string }> {
 	return post({ action: 'register', eventId })
 }
 
@@ -13,7 +13,7 @@ export function fetchRegistrations(): Promise<Registration[]> {
 	return get<Registration[]>({ action: 'registrations' })
 }
 
-export function registerGuest(eventId: string, guestName: string): Promise<{ status: string; eventId: string; guestName: string }> {
+export function registerGuest(eventId: string, guestName: string): Promise<{ status: string; eventId: string; guestName: string; ticketId: string }> {
 	return post({ action: 'register_guest', eventId, guestName })
 }
 
