@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'miniapp/**'       # только если изменился фронт
+  workflow_dispatch:
 
 jobs:
   deploy:
