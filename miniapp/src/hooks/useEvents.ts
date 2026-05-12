@@ -46,6 +46,16 @@ export function useEvents() {
 		))
 	}
 
+	function getPaymentStatus(eventId: string): string | null {
+		return registrations.find(r => r.eventId === eventId && !r.isGuest)?.paymentStatus ?? null
+	}
+
+	function setPaymentStatusLocal(eventId: string, status: string) {
+		setRegistrations(prev => prev.map(r =>
+			r.eventId === eventId && !r.isGuest ? { ...r, paymentStatus: status } : r
+		))
+	}
+
 	function addEvent(event: Event) {
 		setEvents(prev => [...prev, event])
 	}
@@ -88,7 +98,9 @@ export function useEvents() {
 		getGuestReg,
 		getConfirmation,
 		getTicketId,
+		getPaymentStatus,
 		setConfirmationLocal,
+		setPaymentStatusLocal,
 		addEvent,
 		updateEvent,
 		addRegistration,

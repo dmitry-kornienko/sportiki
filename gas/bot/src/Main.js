@@ -234,6 +234,13 @@ const CallbackRouter = {
 			handler: (c, d, id) => CallbackHandlers.adminEditField(c, d, id),
 		},
 
+		// Подтверждение оплаты (admin)
+		{
+			prefix: 'confirm_pay_',
+			exact: false,
+			handler: (c, d, id, mid) => CallbackHandlers.confirmPayment(c, d, id, mid),
+		},
+
 		// Админ: рассылка
 		{
 			prefix: 'admin_broadcast',
@@ -586,6 +593,40 @@ const CallbackHandlers = {
 		AdminBroadcastHandlers.send(chatId, parsed.target, parsed.text)
 	},
 
+	// --- Подтверждение оплаты ---
+
+	confirmPayment(chatId, data, cbId, messageId) {
+		if (!this._checkAdmin(chatId, cbId)) return
+
+		const withoutPrefix  = data.replace('confirm_pay_', '')
+		const lastUnderscore = withoutPrefix.lastIndexOf('_')
+		const eventId        = withoutPrefix.substring(0, lastUnderscore)
+		const userChatId     = withoutPrefix.substring(lastUnderscore + 1)
+
+		const reg = db.findRegByUserAndEvent ? db.findRegByUserAndEvent(userChatId, eventId) : null
+
+		db.setPaymentStatus(userChatId, eventId, 'Confirmed')
+
+		const event = db.getEventById(eventId)
+		const eventLine = event
+			? `${event.type || ''} *${escapeMarkdown(event.title)}*`
+			: 'событие'
+
+		const user        = db.findUser(userChatId)
+		const userName    = user ? escapeMarkdown(user.firstName) : userChatId
+		const username    = user && user.username !== 'no_username' ? user.username : null
+		const userDisplay = username ? `${userName} (${username})` : userName
+
+		TelegramApi.sendMessage(
+			userChatId,
+			`✅ *Оплата подтверждена!*\n\n${eventLine}\n\nДо встречи на старте 🙌`,
+			Keyboards.eventInMiniApp(eventId)
+		)
+
+		TelegramApi.answerCallback(cbId, '✅ Оплата подтверждена')
+		TelegramApi.editCaption(chatId, messageId, `✅ *Оплата подтверждена*\n\n👤 ${userDisplay}\n${eventLine}`)
+	},
+
 	// --- Приватные утилиты ---
 
 	_extractId(data, prefix) {
@@ -825,6 +866,22 @@ const TelegramApi = {
 			// Fallback — если редактирование не удалось, отправляем новое сообщение
 			console.warn('editMessage failed, sending new: ' + e)
 			this.sendMessage(chatId, text, keyboard)
+		}
+	},
+
+	editCaption(chatId, messageId, caption, keyboard = null) {
+		const token = getBotToken()
+		const payload = { chat_id: chatId, message_id: messageId, caption, parse_mode: 'Markdown' }
+		if (keyboard) payload.reply_markup = JSON.stringify(keyboard)
+		try {
+			UrlFetchApp.fetch(`https://api.telegram.org/bot${token}/editMessageCaption`, {
+				method: 'post',
+				contentType: 'application/json',
+				payload: JSON.stringify(payload),
+				muteHttpExceptions: true,
+			})
+		} catch (e) {
+			console.warn('editCaption failed: ' + e)
 		}
 	},
 

@@ -32,3 +32,7 @@ export function getTicket(ticketId: string): Promise<TicketData> {
 export function checkin(ticketId: string): Promise<{ checkedInAt: string; stats: import('../types').CheckinStats }> {
 	return post({ action: 'checkin', ticketId })
 }
+
+export function submitPayment(eventId: string, photoBase64: string): Promise<{ submitted: boolean }> {
+	return post({ action: 'submit_payment', eventId, photoBase64 })
+}

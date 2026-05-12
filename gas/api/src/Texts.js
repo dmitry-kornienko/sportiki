@@ -62,6 +62,33 @@ const Texts = {
 	},
 
 	/**
+	 * Уведомление администраторам о новом платеже.
+	 */
+	paymentNotification({ eventLine, date, time, amount, userName, username }) {
+		const userDisplay = username ? `${userName} (${username})` : userName
+		return (
+			`💳 <b>Новый платёж!</b>\n\n` +
+			`👤 ${userDisplay}\n` +
+			`${eventLine}\n` +
+			`📅 ${date} / ${time}\n` +
+			`💰 ${amount}`
+		)
+	},
+
+	/**
+	 * Уведомление пользователю об успешном подтверждении оплаты.
+	 */
+	paymentConfirmed({ eventLine, date, time, amount }) {
+		return (
+			`✅ Ваша оплата подтверждена!\n\n` +
+			`${eventLine}\n\n` +
+			`📅 ${date}\n🕐 ${time}\n` +
+			`💰 ${amount}\n\n` +
+			`Ждём вас на событии 🙌`
+		)
+	},
+
+	/**
 	 * Ребалансировка: резерв переполнен → запись удалена.
 	 */
 	rebalanceDeleted({ eventLine, date, time }) {

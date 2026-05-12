@@ -298,6 +298,27 @@ const RegRepository = {
 		return ticketId
 	},
 
+	// Устанавливает PAYMENT_STATUS для пользовательской (не гостевой) регистрации.
+	setPaymentStatus(chatId, eventId, value) {
+		const data = SheetCache.data(SHEET_NAMES.REGS)
+		const sheet = SheetCache.sheet(SHEET_NAMES.REGS)
+		const cId = chatId.toString()
+		const eId = eventId.toString()
+		for (let i = 1; i < data.length; i++) {
+			const row = data[i]
+			if (
+				row[COL.REGS.CHAT_ID]?.toString().trim() === cId &&
+				row[COL.REGS.EVENT_ID]?.toString().trim() === eId &&
+				row[COL.REGS.IS_GUEST] !== 'YES'
+			) {
+				sheet.getRange(i + 1, COL.REGS.PAYMENT_STATUS + 1).setValue(value)
+				SheetCache.invalidate(SHEET_NAMES.REGS)
+				return true
+			}
+		}
+		return false
+	},
+
 	// Устанавливает значение колонки CONFIRMATION для всех строк chatId+eventId.
 	setConfirmation(chatId, eventId, value) {
 		const data = SheetCache.data(SHEET_NAMES.REGS)
@@ -585,6 +606,9 @@ const db = {
 	},
 	setConfirmation(chatId, eventId, value) {
 		return RegRepository.setConfirmation(chatId, eventId, value)
+	},
+	setPaymentStatus(chatId, eventId, value) {
+		return RegRepository.setPaymentStatus(chatId, eventId, value)
 	},
 	findRegByTicketId(ticketId) {
 		return RegRepository.findByTicketId(ticketId)

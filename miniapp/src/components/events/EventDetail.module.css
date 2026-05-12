@@ -146,6 +146,22 @@
 	opacity: 0.8;
 }
 
+.payConfirmed {
+	font-family: 'Barlow Condensed', sans-serif;
+	font-weight: 700;
+	font-size: 13px;
+	color: #22c55e;
+	flex-shrink: 0;
+}
+
+.payPending {
+	font-family: 'Barlow Condensed', sans-serif;
+	font-weight: 700;
+	font-size: 13px;
+	color: var(--tg-theme-hint-color, #888);
+	flex-shrink: 0;
+}
+
 .payMethodsList {
 	display: flex;
 	flex-direction: column;

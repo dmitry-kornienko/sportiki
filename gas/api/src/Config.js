@@ -126,6 +126,64 @@ function sendTelegramMessage(chatId, text, keyboard = null) {
 }
 
 /**
+ * Отправляет фото через Telegram Bot API (blob — первая отправка).
+ * Возвращает { messageId, fileId } или null при ошибке.
+ * @param {string|number} chatId
+ * @param {GoogleAppsScript.Base.Blob} blob
+ * @param {string} caption
+ * @param {object|null} keyboard
+ */
+function sendTelegramPhoto(chatId, blob, caption, keyboard = null) {
+	try {
+		const token = getBotToken()
+		const form = {
+			chat_id: chatId.toString(),
+			caption: caption || '',
+			parse_mode: 'HTML',
+			photo: blob,
+		}
+		if (keyboard) form.reply_markup = JSON.stringify(keyboard)
+
+		const res = UrlFetchApp.fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+			method: 'post',
+			payload: form,
+			muteHttpExceptions: true,
+		})
+		const json = JSON.parse(res.getContentText())
+		if (!json.ok) { console.error('sendTelegramPhoto error: ' + JSON.stringify(json)); return null }
+		const photos = json.result.photo
+		return { messageId: json.result.message_id, fileId: photos[photos.length - 1].file_id }
+	} catch (e) {
+		console.error('sendTelegramPhoto exception: ' + e)
+		return null
+	}
+}
+
+/**
+ * Отправляет фото по file_id (повторная отправка без загрузки).
+ * @param {string|number} chatId
+ * @param {string} fileId
+ * @param {string} caption
+ * @param {object|null} keyboard
+ */
+function sendTelegramPhotoById(chatId, fileId, caption, keyboard = null) {
+	try {
+		const token = getBotToken()
+		const payload = { chat_id: chatId.toString(), photo: fileId, caption: caption || '', parse_mode: 'HTML' }
+		if (keyboard) payload.reply_markup = JSON.stringify(keyboard)
+
+		UrlFetchApp.fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+			method: 'post',
+			contentType: 'application/json',
+			payload: JSON.stringify(payload),
+			muteHttpExceptions: true,
+		})
+	} catch (e) {
+		console.error('sendTelegramPhotoById exception: ' + e)
+	}
+}
+
+/**
  * Редактирует существующее сообщение бота.
  * @param {string|number} chatId
  * @param {string|number} messageId

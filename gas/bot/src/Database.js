@@ -36,18 +36,20 @@ const COLUMNS = Object.freeze({
     STATUS:        8,
     LOCATION:      9,
     REMINDER_SENT: 10,
-    RESERVE_LIMIT: 11
+    RESERVE_LIMIT: 11,
+    PRICE:         12,
   },
   REGS: {
-    CHAT_ID:       1,
-    EVENT_ID:      2,
-    NAME:          3,
-    REG_DATE:      4,
-    STATUS:        5,
-    USERNAME:      6,
-    TG_NAME:       7,
-    IS_GUEST:      8,
-    CONFIRMATION:  9
+    CHAT_ID:        1,
+    EVENT_ID:       2,
+    NAME:           3,
+    REG_DATE:       4,
+    STATUS:         5,
+    USERNAME:       6,
+    TG_NAME:        7,
+    IS_GUEST:       8,
+    CONFIRMATION:   9,
+    PAYMENT_STATUS: 11
   }
 });
 
@@ -75,18 +77,20 @@ const COL = Object.freeze({
     STATUS:        7,
     LOCATION:      8,
     REMINDER_SENT: 9,
-    RESERVE_LIMIT: 10
+    RESERVE_LIMIT: 10,
+    PRICE:         11,
   },
   REGS: {
-    CHAT_ID:       0,
-    EVENT_ID:      1,
-    NAME:          2,
-    REG_DATE:      3,
-    STATUS:        4,
-    USERNAME:      5,
-    TG_NAME:       6,
-    IS_GUEST:      7,
-    CONFIRMATION:  8
+    CHAT_ID:        0,
+    EVENT_ID:       1,
+    NAME:           2,
+    REG_DATE:       3,
+    STATUS:         4,
+    USERNAME:       5,
+    TG_NAME:        6,
+    IS_GUEST:       7,
+    CONFIRMATION:   8,
+    PAYMENT_STATUS: 10
   }
 });
 
@@ -217,7 +221,8 @@ const EventRepository = {
       status:       row[COL.EVENTS.STATUS]        ? row[COL.EVENTS.STATUS].toString().trim() : '',
       location:     row[COL.EVENTS.LOCATION]      ? row[COL.EVENTS.LOCATION].toString()      : '',
       reminderSent: row[COL.EVENTS.REMINDER_SENT] ? row[COL.EVENTS.REMINDER_SENT].toString() : '',
-      reserveLimit: row[COL.EVENTS.RESERVE_LIMIT] ? parseInt(row[COL.EVENTS.RESERVE_LIMIT])  : RESERVE_LIMIT
+      reserveLimit: row[COL.EVENTS.RESERVE_LIMIT] ? parseInt(row[COL.EVENTS.RESERVE_LIMIT])  : RESERVE_LIMIT,
+      price:        row[COL.EVENTS.PRICE]         ? Number(row[COL.EVENTS.PRICE])             : 0,
     };
   },
 
@@ -578,6 +583,24 @@ const RegRepository = {
     SheetCache.invalidate(SHEET_NAMES.REGS);
   },
 
+  setPaymentStatus(chatId, eventId, value) {
+    const sheet = SheetCache.sheet(SHEET_NAMES.REGS);
+    const data  = SheetCache.data(SHEET_NAMES.REGS);
+    const uid   = chatId.toString();
+    const eid   = eventId.toString();
+
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][COL.REGS.CHAT_ID].toString()  === uid &&
+          data[i][COL.REGS.EVENT_ID].toString() === eid &&
+          data[i][COL.REGS.IS_GUEST] !== 'YES') {
+        sheet.getRange(i + 1, COLUMNS.REGS.PAYMENT_STATUS).setValue(value);
+        SheetCache.invalidate(SHEET_NAMES.REGS);
+        return true;
+      }
+    }
+    return false;
+  },
+
   _afterRemove(eventId) {
     this._promoteFromReserve(eventId);
 
@@ -641,6 +664,7 @@ const db = {
   // --- Users ---
   registerUser(chatId, from)        { return UserRepository.register(chatId, from); },
   getAllUsers()                      { return UserRepository.getAllChatIds(); },
+  findUser(chatId)                  { return UserRepository.find(chatId); },
 
   // --- States ---
   getState(chatId)                  { return StateRepository.get(chatId); },
@@ -680,6 +704,9 @@ const db = {
   },
   setConfirmation(chatId, eventId, status) {
     return RegRepository.setConfirmation(chatId, eventId, status);
+  },
+  setPaymentStatus(chatId, eventId, value) {
+    return RegRepository.setPaymentStatus(chatId, eventId, value);
   },
 
   // --- Служебное ---

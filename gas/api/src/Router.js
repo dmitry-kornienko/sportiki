@@ -86,6 +86,10 @@ function doPost(e) {
 				return EventsController.update(body, currentUser)
 			case 'confirm_attendance':
 				return RegistrationsController.confirmAttendance(body, currentUser)
+			case 'submit_payment':
+				return RegistrationsController.submitPayment(body, currentUser)
+			case 'confirm_payment':
+				return RegistrationsController.confirmPayment(body, currentUser)
 
 			case 'checkin':
 				return RegistrationsController.checkin(body, currentUser)

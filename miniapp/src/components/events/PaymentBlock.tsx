@@ -12,10 +12,12 @@ const PAY_LABELS: Record<string, { icon: string; label: string }> = {
 interface Props {
 	price: number
 	paymentInfo: string
+	paymentStatus: string | null
+	isMain: boolean
 	onPayClick: () => void
 }
 
-export function PaymentBlock({ price, paymentInfo, onPayClick }: Props) {
+export function PaymentBlock({ price, paymentInfo, paymentStatus, isMain, onPayClick }: Props) {
 	const toast = useToastAction()
 
 	let methods: Record<string, string | boolean> | null = null
@@ -31,7 +33,15 @@ export function PaymentBlock({ price, paymentInfo, onPayClick }: Props) {
 		<div className={s.paymentBlock}>
 			<div className={s.paymentHeader}>
 				<div className={s.paymentTitle}>💳 Платное — {formatPrice(price)}</div>
-				<button className={s.payBtn} onClick={onPayClick}>Оплатить</button>
+				{isMain && paymentStatus === 'Confirmed' && (
+					<div className={s.payConfirmed}>✅ Оплачено</div>
+				)}
+				{isMain && paymentStatus === 'Pending' && (
+					<div className={s.payPending}>⏳ На проверке</div>
+				)}
+				{isMain && !paymentStatus && (
+					<button className={s.payBtn} onClick={onPayClick}>Оплатить</button>
+				)}
 			</div>
 			{methods && (
 				<div className={s.payMethodsList}>

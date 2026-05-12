@@ -192,6 +192,88 @@ const RegistrationsController = {
 	},
 
 	/**
+	 * POST action=submit_payment
+	 * Body: { eventId, photoBase64 }
+	 * Пользователь отправляет скриншот оплаты. Ставит PaymentStatus=Pending,
+	 * рассылает фото + кнопку подтверждения всем администраторам.
+	 */
+	submitPayment(body, user) {
+		const { eventId, photoBase64 } = body
+		if (!eventId)     return Response.error('Не указан eventId')
+		if (!photoBase64) return Response.error('Не прикреплён скриншот')
+
+		const chatId = user.id.toString()
+		db.clearCache()
+
+		const event = db.getEventById(eventId)
+		if (!event)            return Response.error('Событие не найдено', 404)
+		if (event.price <= 0)  return Response.error('Событие бесплатное')
+
+		const reg = db.findRegByUserAndEvent(chatId, eventId)
+		if (!reg)                             return Response.error('Регистрация не найдена', 404)
+		if (reg.status !== REG_STATUS.MAIN)   return Response.error('Только участники основного состава могут подтвердить оплату')
+		if (reg.paymentStatus === 'Confirmed') return Response.error('Оплата уже подтверждена')
+
+		db.setPaymentStatus(chatId, eventId, 'Pending')
+
+		const eventLine   = (event.type ? event.type + ' ' : '') + '<b>' + event.title + '</b>'
+		const amount      = Number(event.price).toLocaleString('ru-RU') + ' ₫'
+		const userName    = user.first_name || user.username || chatId
+		const username    = user.username ? '@' + user.username : null
+		const caption     = Texts.paymentNotification({ eventLine, date: event.date, time: event.time, amount, userName, username })
+		const keyboard    = { inline_keyboard: [[{ text: '✅ Подтвердить оплату', callback_data: `confirm_pay_${eventId}_${chatId}` }]] }
+
+		const base64Data  = photoBase64.replace(/^data:image\/\w+;base64,/, '')
+		const bytes       = Utilities.base64Decode(base64Data)
+		const blob        = Utilities.newBlob(bytes, 'image/jpeg', 'payment.jpg')
+
+		const adminIds = getAdminIds()
+		if (adminIds.length > 0) {
+			const first = sendTelegramPhoto(adminIds[0], blob, caption, keyboard)
+			if (first && first.fileId && adminIds.length > 1) {
+				adminIds.slice(1).forEach(id => sendTelegramPhotoById(id, first.fileId, caption, keyboard))
+			}
+		}
+
+		return Response.ok({ submitted: true })
+	},
+
+	/**
+	 * POST action=confirm_payment
+	 * Body: { eventId, chatId }
+	 * Только для администраторов. Подтверждает оплату и уведомляет пользователя.
+	 */
+	confirmPayment(body, user) {
+		if (!isAdmin(user.id)) return Response.error('Доступ запрещён', 403)
+
+		const { eventId, chatId } = body
+		if (!eventId) return Response.error('Не указан eventId')
+		if (!chatId)  return Response.error('Не указан chatId')
+
+		db.clearCache()
+
+		const event = db.getEventById(eventId)
+		if (!event) return Response.error('Событие не найдено', 404)
+
+		const reg = db.findRegByUserAndEvent(chatId, eventId)
+		if (!reg)                              return Response.error('Регистрация не найдена', 404)
+		if (reg.paymentStatus === 'Confirmed') return Response.error('Оплата уже подтверждена')
+
+		db.setPaymentStatus(chatId, eventId, 'Confirmed')
+
+		const eventLine = (event.type ? event.type + ' ' : '') + event.title
+		const amount    = Number(event.price).toLocaleString('ru-RU') + ' ₫'
+
+		sendTelegramMessage(
+			chatId,
+			Texts.paymentConfirmed({ eventLine, date: event.date, time: event.time, amount }),
+			makeEventKeyboard(eventId)
+		)
+
+		return Response.ok({ confirmed: true })
+	},
+
+	/**
 	 * POST action=confirm_attendance
 	 * Body: { eventId }
 	 * Подтверждает участие — ставит CONFIRMATION=Confirmed.

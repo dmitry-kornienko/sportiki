@@ -22,6 +22,7 @@ interface Props {
 	regStatus: 'MAIN' | 'RESERVE' | null
 	confirmation: string | null
 	ticketId: string | null
+	paymentStatus: string | null
 	guestReg: Registration | null
 	onRegister: (eventId: string, status: 'MAIN' | 'RESERVE', ticketId: string) => void
 	onUnregister: (eventId: string) => void
@@ -29,6 +30,7 @@ interface Props {
 	onGuestUnregister: (eventId: string) => void
 	onEventUpdate: (event: Event) => void
 	onConfirmed: () => void
+	onPaymentSubmitted: () => void
 	onBack: () => void
 }
 
@@ -37,6 +39,7 @@ export function EventDetail({
 	regStatus,
 	confirmation,
 	ticketId,
+	paymentStatus,
 	guestReg,
 	onRegister,
 	onUnregister,
@@ -44,6 +47,7 @@ export function EventDetail({
 	onGuestUnregister,
 	onEventUpdate,
 	onConfirmed,
+	onPaymentSubmitted,
 	onBack,
 }: Props) {
 	const [event, setEvent] = useState<Event>(initialEvent)
@@ -218,6 +222,8 @@ export function EventDetail({
 						<PaymentBlock
 							price={event.price}
 							paymentInfo={event.paymentInfo}
+							paymentStatus={paymentStatus}
+							isMain={regStatus === 'MAIN'}
 							onPayClick={() => setShowPaySheet(true)}
 						/>
 					)}
@@ -274,8 +280,10 @@ export function EventDetail({
 
 			{showPaySheet && (
 				<PaymentSheet
+					eventId={event.id}
 					title={event.title}
 					price={event.price}
+					onSubmitted={() => { onPaymentSubmitted(); setShowPaySheet(false) }}
 					onClose={() => setShowPaySheet(false)}
 				/>
 			)}
