@@ -588,17 +588,29 @@ const RegRepository = {
     const data  = SheetCache.data(SHEET_NAMES.REGS);
     const uid   = chatId.toString();
     const eid   = eventId.toString();
+    let updated = false;
 
     for (let i = 1; i < data.length; i++) {
       if (data[i][COL.REGS.CHAT_ID].toString()  === uid &&
-          data[i][COL.REGS.EVENT_ID].toString() === eid &&
-          data[i][COL.REGS.IS_GUEST] !== 'YES') {
+          data[i][COL.REGS.EVENT_ID].toString() === eid) {
         sheet.getRange(i + 1, COLUMNS.REGS.PAYMENT_STATUS).setValue(value);
-        SheetCache.invalidate(SHEET_NAMES.REGS);
-        return true;
+        updated = true;
       }
     }
-    return false;
+    if (updated) SheetCache.invalidate(SHEET_NAMES.REGS);
+    return updated;
+  },
+
+  findByUserAndEvent(chatId, eventId) {
+    const data = SheetCache.data(SHEET_NAMES.REGS);
+    const uid  = chatId.toString();
+    const eid  = eventId.toString();
+    const row  = data.slice(1).find(r =>
+      r[COL.REGS.CHAT_ID].toString().trim()  === uid &&
+      r[COL.REGS.EVENT_ID].toString().trim() === eid &&
+      r[COL.REGS.IS_GUEST].toString().toUpperCase() !== 'YES'
+    );
+    return row ? this._rowToReg(row) : null;
   },
 
   _afterRemove(eventId) {
@@ -707,6 +719,9 @@ const db = {
   },
   setPaymentStatus(chatId, eventId, value) {
     return RegRepository.setPaymentStatus(chatId, eventId, value);
+  },
+  findRegByUserAndEvent(chatId, eventId) {
+    return RegRepository.findByUserAndEvent(chatId, eventId);
   },
 
   // --- Служебное ---

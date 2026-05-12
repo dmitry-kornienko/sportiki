@@ -28,6 +28,7 @@ export interface Participant {
 	username: string
 	isGuest: boolean
 	confirmed: boolean
+	paymentConfirmed: boolean
 }
 
 export const EVENT_STATUS = {

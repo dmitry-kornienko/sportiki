@@ -208,6 +208,7 @@ export function EventDetail({
 											await confirmAttendance(event.id)
 											onConfirmed()
 											showToast('✅ Участие подтверждено!')
+											actions.refreshEvent()
 										} finally {
 											setConfirmLoading(false)
 										}

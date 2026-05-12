@@ -64,11 +64,12 @@ const Texts = {
 	/**
 	 * Уведомление администраторам о новом платеже.
 	 */
-	paymentNotification({ eventLine, date, time, amount, userName, username }) {
+	paymentNotification({ eventLine, date, time, amount, userName, username, guestName }) {
 		const userDisplay = username ? `${userName} (${username})` : userName
+		const guestLine   = guestName ? `\n👥 + гость: ${guestName}` : ''
 		return (
 			`💳 <b>Новый платёж!</b>\n\n` +
-			`👤 ${userDisplay}\n` +
+			`👤 ${userDisplay}${guestLine}\n` +
 			`${eventLine}\n` +
 			`📅 ${date} / ${time}\n` +
 			`💰 ${amount}`
@@ -97,6 +98,19 @@ const Texts = {
 			`Событие:\n${eventLine}\n\n` +
 			`📅 ${date}\n🕐 ${time}\n\n` +
 			`Вы можете записаться снова, если появятся свободные места.`
+		)
+	},
+
+	/**
+	 * Уведомление менеджеру мерча о новом заказе.
+	 */
+	newMerchOrder({ userDisplay, chatId, itemsList, total }) {
+		return (
+			`🛍 <b>Новый заказ мерча!</b>\n\n` +
+			`👤 ${userDisplay}\n` +
+			`🆔 <code>${chatId}</code>\n\n` +
+			`${itemsList}\n\n` +
+			`💰 Итого: <b>${total}</b>`
 		)
 	},
 }

@@ -94,6 +94,9 @@ function doPost(e) {
 			case 'checkin':
 				return RegistrationsController.checkin(body, currentUser)
 
+			case 'order':
+				return MerchController.createOrder(body, currentUser)
+
 			default:
 				return Response.error(`Неизвестный action: ${action}`, 404)
 		}

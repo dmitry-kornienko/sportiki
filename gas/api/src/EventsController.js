@@ -54,6 +54,7 @@ const EventsController = {
 			username: r.username,
 			isGuest: r.isGuest,
 			confirmed: r.confirmed,
+			paymentConfirmed: r.paymentStatus === 'Confirmed',
 		}))
 
 		const reserveParticipants = reserveRegs.map(r => ({
@@ -61,6 +62,7 @@ const EventsController = {
 			username: r.username,
 			isGuest: r.isGuest,
 			confirmed: r.confirmed,
+			paymentConfirmed: r.paymentStatus === 'Confirmed',
 		}))
 
 		return Response.ok({

@@ -212,6 +212,14 @@ function editTelegramMessage(chatId, messageId, text) {
  * Возвращает URL Mini App из Script Properties.
  * @returns {string}
  */
+/**
+ * Возвращает chat ID менеджера мерча из Script Properties.
+ * @returns {string}
+ */
+function getMerchManagerId() {
+	return PropertiesService.getScriptProperties().getProperty('MERCH_MANAGER_ID') || ''
+}
+
 function getMiniAppUrl() {
 	const props = PropertiesService.getScriptProperties().getProperties()
 	return props['MINI_APP_URL'] || 'https://dmitry-kornienko.github.io/sportiki'

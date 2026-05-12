@@ -216,11 +216,14 @@ const RegistrationsController = {
 
 		db.setPaymentStatus(chatId, eventId, 'Pending')
 
+		const guestReg    = db.findGuestByUserAndEvent(chatId, eventId)
+		const people      = guestReg ? 2 : 1
 		const eventLine   = (event.type ? event.type + ' ' : '') + '<b>' + event.title + '</b>'
-		const amount      = Number(event.price).toLocaleString('ru-RU') + ' ₫'
+		const amount      = (Number(event.price) * people).toLocaleString('ru-RU') + ' ₫'
 		const userName    = user.first_name || user.username || chatId
 		const username    = user.username ? '@' + user.username : null
-		const caption     = Texts.paymentNotification({ eventLine, date: event.date, time: event.time, amount, userName, username })
+		const guestName   = guestReg ? guestReg.name : null
+		const caption     = Texts.paymentNotification({ eventLine, date: event.date, time: event.time, amount, userName, username, guestName })
 		const keyboard    = { inline_keyboard: [[{ text: '✅ Подтвердить оплату', callback_data: `confirm_pay_${eventId}_${chatId}` }]] }
 
 		const base64Data  = photoBase64.replace(/^data:image\/\w+;base64,/, '')

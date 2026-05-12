@@ -150,6 +150,18 @@
 	transform: scale(0.98);
 }
 
+.checkoutBtn:disabled {
+	opacity: 0.6;
+	cursor: default;
+}
+
+.error {
+	font-size: 13px;
+	color: var(--tg-theme-destructive-text-color, #ef4444);
+	text-align: center;
+	margin-bottom: 8px;
+}
+
 .success {
 	display: flex;
 	position: fixed;
@@ -188,4 +200,16 @@
 	font-size: 15px;
 	color: var(--gray);
 	line-height: 1.5;
+}
+
+.backBtn {
+	margin-top: 28px;
+	padding: 10px 24px;
+	border-radius: 20px;
+	border: 1.5px solid var(--tg-theme-button-color, #3b82f6);
+	background: transparent;
+	color: var(--tg-theme-button-color, #3b82f6);
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
 }

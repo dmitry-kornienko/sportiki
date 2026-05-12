@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { CartItem } from '../../types'
 import { formatPrice } from '../../utils/format'
+import { submitOrder } from '../../api/merch'
 import { EmptyState } from '../ui/EmptyState'
 import s from './Cart.module.css'
 
@@ -9,22 +10,27 @@ interface Props {
 	total: number
 	onRemove: (idx: number) => void
 	onClear: () => void
+	onBack: () => void
 }
 
-export function Cart({ cart, total, onRemove, onClear }: Props) {
+export function Cart({ cart, total, onRemove, onClear, onBack }: Props) {
 	const [success, setSuccess] = useState(false)
+	const [loading, setLoading] = useState(false)
+	const [error, setError] = useState<string | null>(null)
 
-	function checkout() {
+	async function checkout() {
 		if (!cart.length) return
-		const orderData = {
-			items: cart.map(i => ({ name: i.name, color: i.color, price: i.price })),
-			total,
+		setLoading(true)
+		setError(null)
+		try {
+			await submitOrder(cart, total)
+			onClear()
+			setSuccess(true)
+		} catch (e) {
+			setError((e as Error).message || 'Ошибка при отправке заявки')
+		} finally {
+			setLoading(false)
 		}
-		if (window.Telegram?.WebApp) {
-			Telegram.WebApp.sendData(JSON.stringify(orderData))
-		}
-		onClear()
-		setSuccess(true)
 	}
 
 	if (success) {
@@ -35,6 +41,7 @@ export function Cart({ cart, total, onRemove, onClear }: Props) {
 				<div className={s.successText}>
 					Наш менеджер свяжется с тобой<br />для уточнения деталей.
 				</div>
+				<button className={s.backBtn} onClick={onBack}>← В каталог</button>
 			</div>
 		)
 	}
@@ -58,8 +65,9 @@ export function Cart({ cart, total, onRemove, onClear }: Props) {
 				<div className={s.note}>
 					После оформления заявки наш менеджер свяжется с тобой для уточнения деталей.
 				</div>
-				<button className={s.checkoutBtn} onClick={checkout}>
-					✓ Оформить заявку
+				{error && <div className={s.error}>{error}</div>}
+				<button className={s.checkoutBtn} onClick={checkout} disabled={loading}>
+					{loading ? 'Отправляем...' : '✓ Оформить заявку'}
 				</button>
 			</div>
 		</div>

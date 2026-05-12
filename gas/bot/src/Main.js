@@ -603,8 +603,6 @@ const CallbackHandlers = {
 		const eventId        = withoutPrefix.substring(0, lastUnderscore)
 		const userChatId     = withoutPrefix.substring(lastUnderscore + 1)
 
-		const reg = db.findRegByUserAndEvent ? db.findRegByUserAndEvent(userChatId, eventId) : null
-
 		db.setPaymentStatus(userChatId, eventId, 'Confirmed')
 
 		const event = db.getEventById(eventId)
@@ -612,10 +610,14 @@ const CallbackHandlers = {
 			? `${event.type || ''} *${escapeMarkdown(event.title)}*`
 			: 'событие'
 
+		const reg         = db.findRegByUserAndEvent(userChatId, eventId)
 		const user        = db.findUser(userChatId)
-		const userName    = user ? escapeMarkdown(user.firstName) : userChatId
-		const username    = user && user.username !== 'no_username' ? user.username : null
-		const userDisplay = username ? `${userName} (${username})` : userName
+		const rawName     = (reg && reg.name) ? reg.name : (user ? user.firstName : userChatId)
+		const rawUsername = (reg && reg.username && reg.username !== 'no_link')
+			? reg.username
+			: (user && user.username !== 'no_username' ? '@' + user.username : null)
+		const userName    = escapeMarkdown(rawName.toString())
+		const userDisplay = rawUsername ? `${userName} (${rawUsername})` : userName
 
 		TelegramApi.sendMessage(
 			userChatId,

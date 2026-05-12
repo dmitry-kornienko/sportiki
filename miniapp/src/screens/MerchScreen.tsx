@@ -39,7 +39,7 @@ export function MerchScreen() {
 					</div>
 				)}
 				{tab === 'cart' && (
-					<Cart cart={cart} total={total} onRemove={removeItem} onClear={clear} />
+					<Cart cart={cart} total={total} onRemove={removeItem} onClear={clear} onBack={() => setTab('catalog')} />
 				)}
 			</div>
 
