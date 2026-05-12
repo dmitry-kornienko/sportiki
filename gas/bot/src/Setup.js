@@ -85,9 +85,8 @@ function registerWebhook() {
 	const token = getBotToken()
 	const secret = getWebhookSecret()
 
-	// URL берётся из: "Развернуть" → "Управление развёртываниями" → скопировать URL
-	const webAppUrl =
-		'https://script.google.com/macros/s/AKfycbxFSH-okbj-P6E_P7ZQ6tPnPzZWYmULslEk8thrN6Le-g8Y5jNsn9MKgli1llQw34ykTQ/exec'
+	const webAppUrl = _PROPS['WEBHOOK_URL']
+	if (!webAppUrl) throw new Error('WEBHOOK_URL не задан в Script Properties')
 
 	const response = UrlFetchApp.fetch(
 		`https://api.telegram.org/bot${token}/setWebhook`,

@@ -25,5 +25,8 @@ jobs:
       - name: Authenticate clasp
         run: echo '${{ secrets.CLASP_CREDENTIALS }}' > ~/.clasprc.json
 
+      - name: Install dependencies
+        run: cd gas/api && npm ci
+
       - name: Deploy API
-        run: cd gas/api && npm run deploy
+        run: cd gas/api && npm run deploy:prod
