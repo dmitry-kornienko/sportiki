@@ -3,8 +3,7 @@
 // Назначение: Константы и доступ к данным окружения.
 // ============================================================
 
-// ID Google Таблицы — одна на всё окружение (бот + API)
-const SPREADSHEET_ID = '1zijJzQ_xOOhq6PtplkgXYdy_pRJkSWMggUZrrDHJ-zA'
+const SPREADSHEET_ID = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID')
 
 // Имена листов — единственное место где они определены
 const SHEET_NAMES = Object.freeze({
