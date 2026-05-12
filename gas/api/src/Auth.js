@@ -1,5 +1,5 @@
 // ============================================================
-// файл: Auth.js
+//  файл: Auth.js
 // Назначение: Верификация Telegram initData.
 // ============================================================
 
@@ -56,7 +56,9 @@ const Auth = {
 				.join('')
 
 			if (expectedHex !== hash) {
-				console.error('Auth hash mismatch. Got: ' + hash + ' Expected: ' + expectedHex)
+				console.error(
+					'Auth hash mismatch. Got: ' + hash + ' Expected: ' + expectedHex,
+				)
 				return null
 			}
 
@@ -80,7 +82,8 @@ const Auth = {
 	 * @returns {{ id: string, username: string, first_name: string }}
 	 */
 	devUser(chatId) {
-		const isDev = PropertiesService.getScriptProperties().getProperty('DEV_MODE') === 'true'
+		const isDev =
+			PropertiesService.getScriptProperties().getProperty('DEV_MODE') === 'true'
 		if (!isDev) return null
 		return {
 			id: chatId || 'dev_user',
