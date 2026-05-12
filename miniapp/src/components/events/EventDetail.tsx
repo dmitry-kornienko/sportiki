@@ -284,7 +284,17 @@ export function EventDetail({
 				<CreateEventSheet
 					open={showEdit}
 					event={event}
-					onUpdated={() => { setShowEdit(false); actions.refreshEvent() }}
+					onUpdated={(updated) => {
+						setShowEdit(false)
+						if (updated.status === EVENT_STATUS.ARCHIVED) {
+							onEventUpdate(updated)
+							onBack()
+						} else {
+							setEvent(updated)
+							onEventUpdate(updated)
+							actions.refreshEvent()
+						}
+					}}
 					onClose={() => setShowEdit(false)}
 				/>
 			)}

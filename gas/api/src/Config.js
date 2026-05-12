@@ -158,3 +158,14 @@ function getMiniAppUrl() {
 	const props = PropertiesService.getScriptProperties().getProperties()
 	return props['MINI_APP_URL'] || 'https://dmitry-kornienko.github.io/sportiki'
 }
+
+/**
+ * Возвращает inline_keyboard с кнопкой-ссылкой на страницу события в Mini App.
+ * @param {string} eventId
+ * @returns {object}
+ */
+function makeEventKeyboard(eventId) {
+	const base = getMiniAppUrl().replace(/\/$/, '')
+	const url = base + '/?eventId=' + eventId
+	return { inline_keyboard: [[{ text: '📅 Открыть событие', web_app: { url } }]] }
+}

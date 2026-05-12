@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { fetchEvents } from '../api/events'
 import { fetchRegistrations } from '../api/registrations'
+import { EVENT_STATUS } from '../types'
 import type { Event, Registration } from '../types'
 
 export function useEvents() {
@@ -50,7 +51,11 @@ export function useEvents() {
 	}
 
 	function updateEvent(updated: Event) {
-		setEvents(prev => prev.map(e => (e.id === updated.id ? updated : e)))
+		if (updated.status === EVENT_STATUS.ARCHIVED) {
+			setEvents(prev => prev.filter(e => e.id !== updated.id))
+		} else {
+			setEvents(prev => prev.map(e => (e.id === updated.id ? updated : e)))
+		}
 	}
 
 	function addRegistration(reg: Registration) {

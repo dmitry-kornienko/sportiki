@@ -199,13 +199,14 @@ const EventsController = {
 	_rebalance(eventId, eventType, eventTitle, eventDate, eventTime, newMaxPeople, newReserveLimit) {
 		const eventLine = (eventType ? eventType + ' ' : '') + eventTitle
 		const ctx = { eventLine, date: eventDate, time: eventTime }
+		const keyboard = makeEventKeyboard(eventId)
 
 		if (newMaxPeople === 0) {
 			const regs = db.getRegsByEvent(eventId)
 			const reserveCount = regs.filter(r => r.status === REG_STATUS.RESERVE).length
 			if (reserveCount === 0) return
 			const promoted = db.promoteFirstN(eventId, reserveCount)
-			promoted.forEach(r => sendTelegramMessage(r.chatId, Texts.rebalancePromoted(ctx)))
+			promoted.forEach(r => sendTelegramMessage(r.chatId, Texts.rebalancePromoted(ctx), keyboard))
 			return
 		}
 
@@ -245,6 +246,6 @@ const EventsController = {
 			}
 		}
 
-		notifications.forEach(({ chatId, text }) => sendTelegramMessage(chatId, text))
+		notifications.forEach(({ chatId, text }) => sendTelegramMessage(chatId, text, keyboard))
 	},
 }

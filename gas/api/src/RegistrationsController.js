@@ -5,7 +5,11 @@
 
 function _sendPromotedNotification(chatId, event) {
 	const eventLine = (event.type ? event.type + ' ' : '') + event.title
-	sendTelegramMessage(chatId, Texts.promoted({ eventLine, date: event.date, time: event.time }))
+	sendTelegramMessage(
+		chatId,
+		Texts.promoted({ eventLine, date: event.date, time: event.time }),
+		makeEventKeyboard(event.id)
+	)
 }
 
 const RegistrationsController = {
