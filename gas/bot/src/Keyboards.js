@@ -20,8 +20,10 @@ const Keyboards = {
 
 		// if (isAdmin(chatId)) {
 		// 	buttons.push([{ text: Texts.buttons.adminCreate, callback_data: 'admin_create_event' }])
-		// 	buttons.push([{ text: Texts.buttons.adminBroadcast, callback_data: 'admin_broadcast' }])
 		// }
+		if (isAdmin(chatId)) {
+			buttons.push([{ text: Texts.buttons.adminBroadcast, callback_data: 'admin_broadcast' }])
+		}
 
 		return { inline_keyboard: buttons }
 	},

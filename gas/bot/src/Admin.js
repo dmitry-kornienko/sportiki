@@ -271,20 +271,21 @@ const AdminBroadcastHandlers = {
 			recipients = db.getAllUsers()
 			confirmText = Texts.admin.broadcastConfirmAll(recipients.length)
 		} else {
-			const parts = db.getParticipants(target)
 			const event = db.getEventById(target)
-			// Берём уникальные chatId участников основного состава
-			recipients = [
-				...new Set(
-					db
-						.getParticipants(target)
-						.filter(p => p.status === 'MAIN')
-						.map(p => p.chatId || null)
-						.filter(Boolean),
-				),
-			]
-			// Получаем chatId через регистрации напрямую
-			const regs = RegRepository ? null : null // используем db
+			const sheet = db._sheet(SHEET_NAMES.REGS)
+			const data = sheet.getDataRange().getValues()
+			const eid = target.toString()
+			const seen = new Set()
+			recipients = []
+			for (let i = 1; i < data.length; i++) {
+				if (data[i][COL.REGS.EVENT_ID].toString() !== eid) continue
+				if (data[i][COL.REGS.STATUS].toString() !== STATUSES.MAIN) continue
+				const id = data[i][COL.REGS.CHAT_ID].toString()
+				if (!seen.has(id)) {
+					seen.add(id)
+					recipients.push(id)
+				}
+			}
 			confirmText = Texts.admin.broadcastConfirmEvent(
 				escapeMarkdown(event ? event.title : target),
 				recipients.length,
