@@ -3,8 +3,6 @@ name: Deploy Mini App to GitHub Pages
 on:
   push:
     branches: [main]
-    paths:
-      - 'miniapp/**'       # только если изменился фронт
   workflow_dispatch:
 
 jobs:
