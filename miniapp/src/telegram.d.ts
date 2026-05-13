@@ -16,6 +16,7 @@ interface TelegramWebApp {
 	sendData(data: string): void
 	showScanQrPopup(params: { text?: string }, callback: (data: string) => void): void
 	closeScanQrPopup(): void
+	openTelegramLink(url: string): void
 }
 
 interface Window {

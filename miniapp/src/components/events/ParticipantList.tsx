@@ -9,14 +9,28 @@ interface Props {
 	loading: boolean
 }
 
+function UsernameLink({ username }: { username: string }) {
+	const handle = username.startsWith('@') ? username.slice(1) : username
+	const tg = window.Telegram?.WebApp
+	return (
+		<span
+			className={s.participantUsername}
+			onClick={() => tg?.openTelegramLink(`https://t.me/${handle}`)}
+			style={{ cursor: 'pointer' }}
+		>
+			{username.startsWith('@') ? username : `@${username}`}
+		</span>
+	)
+}
+
 function ParticipantItem({ p }: { p: Participant }) {
 	return (
 		<li className={s.participantItem}>
 			<span className={s.participantName}>{p.name}</span>
 			{p.username && (
 				p.isGuest
-					? <span className={s.participantGuest}>(гость от {p.username})</span>
-					: <span className={s.participantUsername}>{p.username}</span>
+					? <span className={s.participantGuest}>(гость от <UsernameLink username={p.username} />)</span>
+					: <UsernameLink username={p.username} />
 			)}
 			{(p.confirmed || p.paymentConfirmed) && (
 				<span className={s.participantBadges}>
