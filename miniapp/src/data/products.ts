@@ -11,7 +11,7 @@ export const PRODUCTS: Product[] = [
 		colors: [
 			{ name: 'Белый', hex: '#f5f3ef', img: 'images/tshirt-white.PNG' },
 			{ name: 'Розовый', hex: '#e8a0b0', img: 'images/tshirt-pink.PNG' },
-			{ name: 'Тёмно-синий', hex: '#3d4f6b', img: 'images/tshirt-slate.PNG' },
+			{ name: 'Графит', hex: '#3d4f6b', img: 'images/tshirt-slate.PNG' },
 		],
 	},
 	{
