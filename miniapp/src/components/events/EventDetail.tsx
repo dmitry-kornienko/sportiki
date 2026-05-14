@@ -8,6 +8,7 @@ import { isAdmin } from '../../utils/telegram'
 import { useEventActions } from '../../hooks/useEventActions'
 import { useToastAction } from '../../context/ToastContext'
 import { PaymentBlock } from './PaymentBlock'
+import { getDayOfWeek } from '../../utils/format'
 import { ParticipantList } from './ParticipantList'
 import { RegisterSheet } from './RegisterSheet'
 import { UnregisterSheet } from './UnregisterSheet'
@@ -176,7 +177,7 @@ export function EventDetail({
 					<div className={s.title}>{event.title}</div>
 					<div className={s.metaRow}>
 						<div className={s.meta}>
-							<div className={s.metaItem}>📅 {event.date}</div>
+							<div className={s.metaItem}>📅 {getDayOfWeek(event.date)} {event.date}</div>
 							<div className={s.metaItem}>🕐 {event.time}</div>
 							{event.location && (
 								<div className={s.metaItem}>

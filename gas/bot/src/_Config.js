@@ -43,6 +43,7 @@ function getMerchManagerId() {
 // --- КОНФИГУРАЦИЯ ---
 
 const CHANNEL_URL = 'https://t.me/INaumkin_coach'
+const INSTAGRAM_URL = 'https://www.instagram.com/sportikicommunity/'
 
 // URL Mini App — задаётся через Script Properties (ключ MINI_APP_URL).
 // Dev: ngrok-ссылка или localhost. Prod: GitHub Pages URL.

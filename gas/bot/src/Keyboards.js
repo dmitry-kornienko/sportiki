@@ -5,7 +5,10 @@
 
 const Keyboards = {
 	mainMenu(events, chatId) {
-		const buttons = [[{ text: Texts.buttons.goToChannel, url: CHANNEL_URL }]]
+		const buttons = [
+			[{ text: Texts.buttons.goToChannel, url: CHANNEL_URL }],
+			[{ text: Texts.buttons.goToInstagram, url: INSTAGRAM_URL }],
+		]
 
 		// events.forEach(ev => {
 		// 	const isClosed = ev.status === STATUSES.CLOSED

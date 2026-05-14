@@ -23,9 +23,10 @@ function UsernameLink({ username }: { username: string }) {
 	)
 }
 
-function ParticipantItem({ p }: { p: Participant }) {
+function ParticipantItem({ p, index }: { p: Participant; index: number }) {
 	return (
 		<li className={s.participantItem}>
+			<span className={s.participantIndex}>{index}.</span>
 			<span className={s.participantName}>{p.name}</span>
 			{p.username && (
 				p.isGuest
@@ -55,7 +56,7 @@ export function ParticipantList({ participants, reserveParticipants, reserveLimi
 				<>
 					<div className={s.participantsTitle}>Участники</div>
 					<ol className={s.participantsList}>
-						{participants!.map((p, i) => <ParticipantItem key={i} p={p} />)}
+						{participants!.map((p, i) => <ParticipantItem key={i} p={p} index={i + 1} />)}
 					</ol>
 				</>
 			)}
@@ -65,7 +66,7 @@ export function ParticipantList({ participants, reserveParticipants, reserveLimi
 						<span>Резерв {reserveParticipants!.length}/{reserveLimit}</span>
 					</div>
 					<ol className={s.participantsList}>
-						{reserveParticipants!.map((p, i) => <ParticipantItem key={i} p={p} />)}
+						{reserveParticipants!.map((p, i) => <ParticipantItem key={i} p={p} index={i + 1} />)}
 					</ol>
 				</>
 			)}

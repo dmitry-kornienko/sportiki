@@ -71,6 +71,7 @@ const Texts = {
 		checkinNo: '❌ Не смогу',
 		abortCancel: '🔙 Назад',
 		goToChannel: '📢 Перейти в канал',
+		goToInstagram: '📸 Instagram',
 		openApp: '🏃 Открыть приложение',
 		adminCreate: '➕ Создать ивент',
 		adminArchiveEvent: '📁 В архив (Admin)',

@@ -1,4 +1,5 @@
 import type { Event } from '../../types'
+import { getDayOfWeek } from '../../utils/format'
 import s from './EventCard.module.css'
 
 interface Props {
@@ -25,7 +26,7 @@ export function EventCard({ event, regStatus, onClick }: Props) {
 					{event.price > 0 && <span className={s.paidBadge}>$</span>}
 				</div>
 				<div className={s.meta}>
-					<span>{event.date}</span>
+					<span>{getDayOfWeek(event.date)} {event.date}</span>
 					<span>{event.time}</span>
 				</div>
 			</div>

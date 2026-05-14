@@ -5,8 +5,8 @@ const CITIES = [
 	{ name: 'Da Nang',    flag: '🇻🇳', active: true },
 	{ name: 'Bali',       flag: '🇮🇩', active: false },
 	{ name: 'Sri Lanka',  flag: '🇱🇰', active: false },
-	{ name: 'Moscow',     flag: '🇷🇺', active: false },
-	{ name: 'Bangkok',    flag: '🇹🇭', active: false },
+	{ name: 'Dubai',      flag: '🇦🇪', active: false },
+	{ name: 'Phuket',     flag: '🇹🇭', active: false },
 ]
 
 export function Header() {
