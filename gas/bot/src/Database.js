@@ -244,7 +244,7 @@ const EventRepository = {
       const min = String(value.getMinutes()).padStart(2, '0');
       return `${h}:${min}`;
     }
-    return value.toString();
+    return value.toString().substring(0, 5);
   },
 
   getActive() {
