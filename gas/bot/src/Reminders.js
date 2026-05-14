@@ -21,6 +21,12 @@
  * @param {string|null} targetEventId — ID конкретного события или null для всех
  */
 function checkAndSendReminders(isManual = false, targetEventId = null) {
+	// GAS time-trigger передаёт event object первым аргументом — защищаемся
+	if (typeof isManual !== 'boolean') isManual = false
+
+	// Сбрасываем кэш — триггер должен читать свежие данные из таблицы
+	SheetCache.clear()
+
 	const now = new Date()
 	const windowEnd = new Date(now.getTime() + 25 * 60 * 60 * 1000)
 
@@ -56,7 +62,7 @@ function checkAndSendReminders(isManual = false, targetEventId = null) {
 		if (eventDate <= now || eventDate > windowEnd) return
 
 		console.log(
-			`Обработка напоминаний для события: ${fullEvent.title} (${fullEvent.date})`,
+			`Обработка напоминаний для события: ${fullEvent.title} (${fullEvent.date} ${fullEvent.time})`,
 		)
 
 		// Группируем строки регистраций по chatId
@@ -160,7 +166,7 @@ function _buildPlayerMap(regsData, eventId) {
 		else playerMap[chatId].isMe = true
 	})
 
-	// Вычисляем hasBeenNotified после сбора всех строк
+	// Вычисляем hasBeenNotified после сбора всех строк (включая строки гостей)
 	Object.values(playerMap).forEach(p => {
 		p.hasBeenNotified = p.allStatuses.some(
 			s => s === STATUSES.NOTIFIED || s === STATUSES.NOTIFIED_MANUAL,
