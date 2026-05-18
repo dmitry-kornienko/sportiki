@@ -1,22 +1,22 @@
 import { useEffect, useState } from 'react'
 import { fetchEvent } from '../../api/events'
 import { confirmAttendance } from '../../api/registrations'
+import { useToastAction } from '../../context/ToastContext'
+import { useEventActions } from '../../hooks/useEventActions'
 import type { Event, Registration } from '../../types'
 import { EVENT_STATUS } from '../../types'
-import { Loader } from '../ui/Loader'
-import { isAdmin } from '../../utils/telegram'
-import { useEventActions } from '../../hooks/useEventActions'
-import { useToastAction } from '../../context/ToastContext'
-import { PaymentBlock } from './PaymentBlock'
 import { getDayOfWeek } from '../../utils/format'
+import { isAdmin } from '../../utils/telegram'
+import { Loader } from '../ui/Loader'
+import { CreateEventSheet } from './CreateEventSheet'
+import s from './EventDetail.module.css'
+import { GuestSheet } from './GuestSheet'
 import { ParticipantList } from './ParticipantList'
+import { PaymentBlock } from './PaymentBlock'
+import { PaymentSheet } from './PaymentSheet'
+import { QrSheet } from './QrSheet'
 import { RegisterSheet } from './RegisterSheet'
 import { UnregisterSheet } from './UnregisterSheet'
-import { GuestSheet } from './GuestSheet'
-import { PaymentSheet } from './PaymentSheet'
-import { CreateEventSheet } from './CreateEventSheet'
-import { QrSheet } from './QrSheet'
-import s from './EventDetail.module.css'
 
 interface Props {
 	event: Event
@@ -25,7 +25,11 @@ interface Props {
 	ticketId: string | null
 	paymentStatus: string | null
 	guestReg: Registration | null
-	onRegister: (eventId: string, status: 'MAIN' | 'RESERVE', ticketId: string) => void
+	onRegister: (
+		eventId: string,
+		status: 'MAIN' | 'RESERVE',
+		ticketId: string,
+	) => void
 	onUnregister: (eventId: string) => void
 	onGuestRegister: (reg: Registration) => void
 	onGuestUnregister: (eventId: string) => void
@@ -73,9 +77,10 @@ export function EventDetail({
 		onEventUpdate,
 	})
 
-	const spotsLeft = event.maxPeople === 0
-		? Infinity
-		: (event.maxPeople + event.reserveLimit) - event.totalCount
+	const spotsLeft =
+		event.maxPeople === 0
+			? Infinity
+			: event.maxPeople + event.reserveLimit - event.totalCount
 	const canRegisterWithGuest = spotsLeft >= 2
 	const canAddGuest = event.maxPeople === 0 || spotsLeft >= 1
 
@@ -88,20 +93,35 @@ export function EventDetail({
 
 	function renderButton() {
 		if (actions.loading) {
-			return <button className={`${s.btn} ${s.btnLoading}`} disabled><Loader /></button>
+			return (
+				<button className={`${s.btn} ${s.btnLoading}`} disabled>
+					<Loader />
+				</button>
+			)
 		}
 
 		if (regStatus === 'MAIN') {
 			return (
 				<div className={s.actionCol}>
-					<button className={`${s.btn} ${s.btnRegistered}`} onClick={() => setShowUnregisterSheet(true)} disabled={actions.guestLoading}>
+					{actions.guestLoading ? (
+						<button className={s.addGuestBtn} disabled>
+							<Loader />
+						</button>
+					) : !guestReg ? (
+						<button
+							className={s.addGuestBtn}
+							onClick={() => setShowGuestSheet(true)}
+						>
+							+ добавить гостя
+						</button>
+					) : null}
+					<button
+						className={`${s.btn} ${s.btnRegistered}`}
+						onClick={() => setShowUnregisterSheet(true)}
+						disabled={actions.guestLoading}
+					>
 						Отменить запись
 					</button>
-					{actions.guestLoading ? (
-						<button className={s.addGuestBtn} disabled><Loader /></button>
-					) : !guestReg ? (
-						<button className={s.addGuestBtn} onClick={() => setShowGuestSheet(true)}>+ Гость</button>
-					) : null}
 				</div>
 			)
 		}
@@ -109,29 +129,52 @@ export function EventDetail({
 		if (regStatus === 'RESERVE') {
 			return (
 				<div className={s.actionCol}>
-					<button className={`${s.btn} ${s.btnReserved}`} onClick={() => setShowUnregisterSheet(true)} disabled={actions.guestLoading}>
+					<button
+						className={`${s.btn} ${s.btnReserved}`}
+						onClick={() => setShowUnregisterSheet(true)}
+						disabled={actions.guestLoading}
+					>
 						⏳ В резерве — отменить
 					</button>
 					{actions.guestLoading ? (
-						<button className={s.addGuestBtn} disabled><Loader /></button>
+						<button className={s.addGuestBtn} disabled>
+							<Loader />
+						</button>
 					) : !guestReg && canAddGuest ? (
-						<button className={s.addGuestBtn} onClick={() => setShowGuestSheet(true)}>+ Гость</button>
+						<button
+							className={s.addGuestBtn}
+							onClick={() => setShowGuestSheet(true)}
+						>
+							+ Гость
+						</button>
 					) : null}
 				</div>
 			)
 		}
 
 		if (event.status !== EVENT_STATUS.OPEN) {
-			return <button className={`${s.btn} ${s.btnClosed}`} disabled>Запись закрыта</button>
+			return (
+				<button className={`${s.btn} ${s.btnClosed}`} disabled>
+					Запись закрыта
+				</button>
+			)
 		}
 
 		if (event.isFull && !event.hasReserve) {
-			const primaryBtn = <button className={`${s.btn} ${s.btnFull}`} disabled>Мест нет</button>
+			const primaryBtn = (
+				<button className={`${s.btn} ${s.btnFull}`} disabled>
+					Мест нет
+				</button>
+			)
 			if (guestReg) {
 				return (
 					<div className={s.actionCol}>
 						{primaryBtn}
-						<button className={s.removeGuestBtn} onClick={actions.removeGuest} disabled={actions.guestLoading}>
+						<button
+							className={s.removeGuestBtn}
+							onClick={actions.removeGuest}
+							disabled={actions.guestLoading}
+						>
 							{actions.guestLoading ? <Loader /> : 'Удалить гостя'}
 						</button>
 					</div>
@@ -140,9 +183,13 @@ export function EventDetail({
 			return primaryBtn
 		}
 
-		const label = event.isFull && event.hasReserve ? 'Записаться в резерв' : 'Записаться'
+		const label =
+			event.isFull && event.hasReserve ? 'Записаться в резерв' : 'Записаться'
 		const primaryBtn = (
-			<button className={`${s.btn} ${s.btnRegister}`} onClick={() => setShowRegisterSheet(true)}>
+			<button
+				className={`${s.btn} ${s.btnRegister}`}
+				onClick={() => setShowRegisterSheet(true)}
+			>
 				{label}
 			</button>
 		)
@@ -150,7 +197,11 @@ export function EventDetail({
 			return (
 				<div className={s.actionCol}>
 					{primaryBtn}
-					<button className={s.removeGuestBtn} onClick={actions.removeGuest} disabled={actions.guestLoading}>
+					<button
+						className={s.removeGuestBtn}
+						onClick={actions.removeGuest}
+						disabled={actions.guestLoading}
+					>
 						{actions.guestLoading ? <Loader /> : 'Удалить гостя'}
 					</button>
 				</div>
@@ -159,17 +210,25 @@ export function EventDetail({
 		return primaryBtn
 	}
 
-	const countClass = event.isFull ? s.countFull : event.hasReserve ? s.countReserve : s.count
+	const countClass = event.isFull
+		? s.countFull
+		: event.hasReserve
+			? s.countReserve
+			: s.count
 	const isLocationUrl = event.location?.startsWith('http')
 
 	return (
 		<>
 			<div className={s.page}>
 				<div className={s.header}>
-					<button className={s.backBtn} onClick={onBack}>←</button>
+					<button className={s.backBtn} onClick={onBack}>
+						←
+					</button>
 					<div className={s.headerTitle}>Назад</div>
 					{isAdmin() && (
-						<button className={s.editBtn} onClick={() => setShowEdit(true)}>Редактировать</button>
+						<button className={s.editBtn} onClick={() => setShowEdit(true)}>
+							Редактировать
+						</button>
 					)}
 				</div>
 				<div className={s.body}>
@@ -177,13 +236,20 @@ export function EventDetail({
 					<div className={s.title}>{event.title}</div>
 					<div className={s.metaRow}>
 						<div className={s.meta}>
-							<div className={s.metaItem}>📅 {getDayOfWeek(event.date)} {event.date}</div>
+							<div className={s.metaItem}>
+								📅 {getDayOfWeek(event.date)} {event.date}
+							</div>
 							<div className={s.metaItem}>🕐 {event.time}</div>
 							{event.location && (
 								<div className={s.metaItem}>
 									📍{' '}
 									{isLocationUrl ? (
-										<a href={event.location} target='_blank' rel='noreferrer' className={s.locationLink}>
+										<a
+											href={event.location}
+											target='_blank'
+											rel='noreferrer'
+											className={s.locationLink}
+										>
 											Локация ↗
 										</a>
 									) : (
@@ -196,7 +262,10 @@ export function EventDetail({
 					</div>
 					{(regStatus === 'MAIN' || regStatus === 'RESERVE') && ticketId && (
 						<div className={s.ticketRow}>
-							<button className={`${s.btn} ${s.btnQr}`} onClick={() => setShowQrSheet(true)}>
+							<button
+								className={`${s.btn} ${s.btnQr}`}
+								onClick={() => setShowQrSheet(true)}
+							>
 								🎟 Мой QR
 							</button>
 							{regStatus === 'MAIN' && confirmation === 'Notified' && (
@@ -237,7 +306,9 @@ export function EventDetail({
 								? `${event.mainCount} / ${event.maxPeople} человек`
 								: `${event.mainCount} участников`}
 						</span>
-						{event.hasReserve && <span className={s.reserveNote}>резерв открыт</span>}
+						{event.hasReserve && (
+							<span className={s.reserveNote}>резерв открыт</span>
+						)}
 					</div>
 					<ParticipantList
 						participants={event.participants}
@@ -254,8 +325,14 @@ export function EventDetail({
 					hasGuest={!!guestReg}
 					loading={actions.loading}
 					isReserve={event.isFull && event.hasReserve}
-					onRegisterOnly={() => { setShowRegisterSheet(false); actions.registerOnly() }}
-					onRegisterWithGuest={name => { setShowRegisterSheet(false); actions.registerWithGuest(name) }}
+					onRegisterOnly={() => {
+						setShowRegisterSheet(false)
+						actions.registerOnly()
+					}}
+					onRegisterWithGuest={name => {
+						setShowRegisterSheet(false)
+						actions.registerWithGuest(name)
+					}}
 					onClose={() => setShowRegisterSheet(false)}
 				/>
 			)}
@@ -265,9 +342,18 @@ export function EventDetail({
 					guestReg={guestReg}
 					loading={actions.loading}
 					guestLoading={actions.guestLoading}
-					onUnregisterSelf={() => { setShowUnregisterSheet(false); actions.unregisterSelf() }}
-					onUnregisterGuest={() => { setShowUnregisterSheet(false); actions.removeGuest() }}
-					onUnregisterBoth={() => { setShowUnregisterSheet(false); actions.unregisterBoth() }}
+					onUnregisterSelf={() => {
+						setShowUnregisterSheet(false)
+						actions.unregisterSelf()
+					}}
+					onUnregisterGuest={() => {
+						setShowUnregisterSheet(false)
+						actions.removeGuest()
+					}}
+					onUnregisterBoth={() => {
+						setShowUnregisterSheet(false)
+						actions.unregisterBoth()
+					}}
 					onClose={() => setShowUnregisterSheet(false)}
 				/>
 			)}
@@ -275,7 +361,10 @@ export function EventDetail({
 			{showGuestSheet && (
 				<GuestSheet
 					loading={actions.guestLoading}
-					onAdd={name => { setShowGuestSheet(false); actions.addGuest(name) }}
+					onAdd={name => {
+						setShowGuestSheet(false)
+						actions.addGuest(name)
+					}}
 					onClose={() => setShowGuestSheet(false)}
 				/>
 			)}
@@ -285,7 +374,10 @@ export function EventDetail({
 					eventId={event.id}
 					title={event.title}
 					price={event.price}
-					onSubmitted={() => { onPaymentSubmitted(); setShowPaySheet(false) }}
+					onSubmitted={() => {
+						onPaymentSubmitted()
+						setShowPaySheet(false)
+					}}
 					onClose={() => setShowPaySheet(false)}
 				/>
 			)}
@@ -294,7 +386,7 @@ export function EventDetail({
 				<CreateEventSheet
 					open={showEdit}
 					event={event}
-					onUpdated={(updated) => {
+					onUpdated={updated => {
 						setShowEdit(false)
 						if (updated.status === EVENT_STATUS.ARCHIVED) {
 							onEventUpdate(updated)
