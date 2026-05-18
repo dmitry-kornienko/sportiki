@@ -129,13 +129,6 @@ export function EventDetail({
 		if (regStatus === 'RESERVE') {
 			return (
 				<div className={s.actionCol}>
-					<button
-						className={`${s.btn} ${s.btnReserved}`}
-						onClick={() => setShowUnregisterSheet(true)}
-						disabled={actions.guestLoading}
-					>
-						⏳ В резерве — отменить
-					</button>
 					{actions.guestLoading ? (
 						<button className={s.addGuestBtn} disabled>
 							<Loader />
@@ -145,9 +138,16 @@ export function EventDetail({
 							className={s.addGuestBtn}
 							onClick={() => setShowGuestSheet(true)}
 						>
-							+ Гость
+							+ добавить гостя
 						</button>
 					) : null}
+					<button
+						className={`${s.btn} ${s.btnReserved}`}
+						onClick={() => setShowUnregisterSheet(true)}
+						disabled={actions.guestLoading}
+					>
+						⏳ В резерве — отменить
+					</button>
 				</div>
 			)
 		}

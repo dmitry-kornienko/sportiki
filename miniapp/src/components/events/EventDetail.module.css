@@ -715,6 +715,7 @@
 .btnReserved {
 	background: var(--warning-bg);
 	color: var(--warning-text);
+	font-size: 12px;
 }
 
 .btnReserve {
