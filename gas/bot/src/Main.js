@@ -617,7 +617,7 @@ const CallbackHandlers = {
 			? reg.username
 			: (user && user.username !== 'no_username' ? '@' + user.username : null)
 		const userName    = escapeMarkdown(rawName.toString())
-		const userDisplay = rawUsername ? `${userName} (${rawUsername})` : userName
+		const userDisplay = rawUsername ? `${userName} (${escapeMarkdown(rawUsername)})` : userName
 
 		TelegramApi.sendMessage(
 			userChatId,

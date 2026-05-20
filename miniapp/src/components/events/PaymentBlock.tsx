@@ -1,12 +1,12 @@
-import { formatPrice } from '../../utils/format'
 import { useToastAction } from '../../context/ToastContext'
+import { formatPrice } from '../../utils/format'
 import s from './EventDetail.module.css'
 
 const PAY_LABELS: Record<string, { icon: string; label: string }> = {
-	vn:    { icon: '🏦', label: 'Вьетнамский счёт' },
-	sbp:   { icon: '📱', label: 'СБП' },
+	vn: { icon: '🏦', label: 'Вьетнамский счёт Vietcombank' },
+	sbp: { icon: '📱', label: 'СБП' },
 	bybit: { icon: '⚡', label: 'Bybit' },
-	cash:  { icon: '💵', label: 'Наличные' },
+	cash: { icon: '💵', label: 'Наличные' },
 }
 
 interface Props {
@@ -17,7 +17,13 @@ interface Props {
 	onPayClick: () => void
 }
 
-export function PaymentBlock({ price, paymentInfo, paymentStatus, isMain, onPayClick }: Props) {
+export function PaymentBlock({
+	price,
+	paymentInfo,
+	paymentStatus,
+	isMain,
+	onPayClick,
+}: Props) {
 	const toast = useToastAction()
 
 	let methods: Record<string, string | boolean> | null = null
@@ -40,17 +46,20 @@ export function PaymentBlock({ price, paymentInfo, paymentStatus, isMain, onPayC
 					<div className={s.payPending}>⏳ На проверке</div>
 				)}
 				{isMain && !paymentStatus && (
-					<button className={s.payBtn} onClick={onPayClick}>Оплатить</button>
+					<button className={s.payBtn} onClick={onPayClick}>
+						Оплатить
+					</button>
 				)}
 			</div>
 			{methods && (
 				<div className={s.payMethodsList}>
 					{Object.entries(methods).map(([key, val]) => {
-						if (key === '_text') return (
-							<div key={key} className={s.payMethodItem}>
-								<span className={s.payMethodText}>{val as string}</span>
-							</div>
-						)
+						if (key === '_text')
+							return (
+								<div key={key} className={s.payMethodItem}>
+									<span className={s.payMethodText}>{val as string}</span>
+								</div>
+							)
 						const cfg = PAY_LABELS[key]
 						if (!cfg) return null
 						const copyable = typeof val === 'string' && !!val
@@ -60,7 +69,8 @@ export function PaymentBlock({ price, paymentInfo, paymentStatus, isMain, onPayC
 								className={`${s.payMethodItem} ${copyable ? s.payMethodItemCopyable : ''}`}
 								onClick={() => {
 									if (!copyable) return
-									navigator.clipboard.writeText(val as string)
+									navigator.clipboard
+										.writeText(val as string)
 										.then(() => toast('Реквизиты скопированы'))
 										.catch(() => toast('Не удалось скопировать'))
 								}}
@@ -68,7 +78,9 @@ export function PaymentBlock({ price, paymentInfo, paymentStatus, isMain, onPayC
 								<span className={s.payMethodIcon}>{cfg.icon}</span>
 								<span className={s.payMethodDetails}>
 									<span className={s.payMethodLabel}>{cfg.label}</span>
-									{copyable && <span className={s.payMethodValue}>{val as string}</span>}
+									{copyable && (
+										<span className={s.payMethodValue}>{val as string}</span>
+									)}
 								</span>
 								{copyable && <span className={s.payMethodCopy}>⎘</span>}
 							</div>

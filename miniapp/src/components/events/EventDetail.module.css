@@ -189,7 +189,7 @@
 
 .payMethodCopy {
 	margin-left: auto;
-	font-size: 14px;
+	font-size: 18px;
 	color: var(--warning-dark);
 	opacity: 0.6;
 	flex-shrink: 0;
